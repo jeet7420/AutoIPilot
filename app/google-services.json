@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1012428654224",
+    "project_id": "hale-sequence-191408"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1012428654224:android:7c7c8218a9182e3a",
+        "android_client_info": {
+          "package_name": "com.whizhomespilot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1012428654224-8kbn84s9ad5ki1ue0oc27pto9mdt8mvc.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "1012428654224-u7d2toe7odumsfr1ul1481oat7ogsr3o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.whizhomespilot",
+            "certificate_hash": "571981889081b49555deb92d8e24742ec299cc22"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_fXfzsEK2yTSCOR2A0C-VWvJK5av7JBE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
