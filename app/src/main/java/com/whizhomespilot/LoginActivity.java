@@ -47,6 +47,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     EditText etUsername, etPassword;
     private ProgressDialog pDialog;
     private SignInButton login;
+    private String controllerId, deviceId, deivceName;
+    HashMap<String, String> innerMap;
     private ImageButton loginButton;
     private GoogleApiClient googleApiClient;
     private GoogleSignInOptions googleSignInOptions;
@@ -80,6 +82,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         myDb = new DatabaseHelper(this);
+
+        myDb.purgeControllerData(StaticValues.USERNAME);
+        myDb.purgeDeviceData(StaticValues.USERNAME);
+        myDb.purgeSchedularData(StaticValues.USERNAME);
 
         etUsername=(EditText)findViewById(R.id.etUsername);
         etPassword=(EditText)findViewById(R.id.etPassword);
@@ -271,17 +277,24 @@ private class MyAsyncTask extends AsyncTask<Void, Void, String> {
                         Iterator iteratorControllerMap = StaticValues.controllerMap.entrySet().iterator();
                         while (iteratorControllerMap.hasNext()) {
                             Map.Entry entry = (Map.Entry)iteratorControllerMap.next();
-                            StaticValues.deviceMap.put(entry.getKey().toString(), StaticValues.serverResult.get(entry.getKey()));
+                            StaticValues.deviceMap.put(entry.getKey().toString(), StaticValues.serverResult.get(entry.getKey().toString()));
                         }
                         Iterator iteratorDeviceMap = StaticValues.deviceMap.entrySet().iterator();
                         while (iteratorDeviceMap.hasNext()) {
                             Map.Entry entry = (Map.Entry)iteratorDeviceMap.next();
-                            Iterator iteratorInnerDeviceMap = StaticValues.serverResult.get(entry.getKey()).entrySet().iterator();
+                            controllerId=entry.getKey().toString();
+                            innerMap=new HashMap<String, String>();
+                            innerMap=(HashMap<String, String>)entry.getValue();
+                            Iterator iteratorInnerDeviceMap = innerMap.entrySet().iterator();
                             while(iteratorInnerDeviceMap.hasNext()){
                                 Map.Entry entry1=(Map.Entry)iteratorInnerDeviceMap.next();
-                                myDb.insertDeviceData(entry1.getKey().toString(), entry.getKey().toString(), entry1.getValue().toString());
+                                myDb.insertDeviceData(entry1.getKey().toString(), controllerId, entry1.getValue().toString());
                             }
                         }
+                        StaticValues.loginUsed=true;
+                        myDb.printControllerData(StaticValues.USERNAME);
+                        myDb.printDeviceData(StaticValues.USERNAME);
+                        //myDb.printSchedularData(StaticValues.USERNAME);
                     }
                     //StaticValues.deviceMap=StaticValues.serverResult.get("homeId");
                     Toast.makeText(getApplicationContext(), "LOGIN SUCCESSFULL", Toast.LENGTH_LONG).show();

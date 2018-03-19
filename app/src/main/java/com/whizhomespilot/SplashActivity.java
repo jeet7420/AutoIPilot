@@ -21,16 +21,23 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
         progressBar = (HorizontalDottedProgress) findViewById(R.id.dotsProgressBar);
         progressBar.setDotsCount(4);
 
         new Handler().postDelayed(new Runnable(){
             @Override
             public void run() {
-                Intent mainIntent = new Intent(SplashActivity.this,LoginActivity.class);
-                SplashActivity.this.startActivity(mainIntent);
-                SplashActivity.this.finish();
+                if(SaveSharedPreference.getUserName(SplashActivity.this).length() == 0){
+                    System.out.println("TEST1");
+                    Intent loginIntent=new Intent(SplashActivity.this,LoginActivity.class);
+                    SplashActivity.this.startActivity(loginIntent);
+                    System.out.println("TEST2");
+                }
+                else{
+                    Intent mainIntent = new Intent(SplashActivity.this,LoginActivity.class);
+                    SplashActivity.this.startActivity(mainIntent);
+                    SplashActivity.this.finish();
+                }
             }
         }, SPLASH_DISPLAY_LENGTH);
     }

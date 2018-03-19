@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -30,6 +31,7 @@ public class StaticValues {
     public static Intent globalRoomIntent;
     public static boolean connectionStatus=false;
     public static String controllerName="";
+    public static String fragmentName="";
     public static ArrayList<String> controllerList=new ArrayList<String>();
     public static ArrayList<String> deviceList=new ArrayList<String>();
     public static final String loginURLLocal="http://192.168.0.107:8057/SmHome/rest/login/authenticateUserWH";
@@ -117,9 +119,9 @@ public class StaticValues {
     public static HashMap<String, String> deviceMapForSelectedController=new HashMap<String, String>();
     public static HashMap<String, String> updateControllerMap=new HashMap<String, String>();
     public static HashMap<String, String> updateDeviceMap=new HashMap<String, String>();
-    public static HashMap<Integer, HashMap<String,String>> schedularMap=new HashMap<Integer, HashMap<String,String>>();
+    public static LinkedHashMap<Integer, HashMap<String,String>> schedularMap=new LinkedHashMap<Integer, HashMap<String,String>>();
     public static int numberOfSchedules=0;
-
+    public static boolean loginUsed=false;
     public static JSONObject metricsData;
 
     public static String roomId="R0";
@@ -130,7 +132,7 @@ public class StaticValues {
         Iterator iteratorControllerMap = StaticValues.controllerMap.entrySet().iterator();
         while (iteratorControllerMap.hasNext()) {
             Map.Entry entry = (Map.Entry)iteratorControllerMap.next();
-            if(entry.getValue().equals(controllerName)){
+            if(entry.getValue().toString().equals(controllerName)){
                 controllerId=entry.getKey().toString();
             }
         }
@@ -157,5 +159,36 @@ public class StaticValues {
             }
         }
         return deviceMapForSelectedController;
+    }
+
+    public static void printControllerMap(){
+        System.out.println(StaticValues.controllerMap);
+    }
+
+    public static void printDeviceMap(){
+        System.out.println(StaticValues.deviceMap);
+    }
+
+    public static void printUpdateControllerMap(){
+        System.out.println(StaticValues.updateControllerMap);
+    }
+
+    public static void printUpdateDeviceMap(){
+        System.out.println(StaticValues.updateDeviceMap);
+    }
+
+    public static void removeFromPosition(int position){
+        Iterator schedularIterator=StaticValues.schedularMap.entrySet().iterator();
+        int count=0;
+        int key=-1;
+        while(schedularIterator.hasNext()){
+            Map.Entry entry=(Map.Entry)schedularIterator.next();
+            if(count==position){
+                key= (int) entry.getKey();
+            }
+            count++;
+        }
+        if(key>0)
+            StaticValues.schedularMap.remove(key);
     }
 }

@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
-
+    DatabaseHelper myDb;
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private String[] mControllerTitles;
@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        System.out.println("TEST3");
         setContentView(R.layout.activity_main);
 
         System.out.println("Inside Main Activity");
@@ -64,7 +65,16 @@ public class MainActivity extends AppCompatActivity {
 
         // finally change the color
         window.setStatusBarColor(ContextCompat.getColor(MainActivity.this,R.color.colorBlack));
-
+        myDb = new DatabaseHelper(this);
+        if(!StaticValues.loginUsed){
+            StaticValues.USERNAME=SaveSharedPreference.getUserName(MainActivity.this);
+            StaticValues.controllerMap=myDb.readControllerData(StaticValues.USERNAME);
+            StaticValues.deviceMap=myDb.readDeviceData(StaticValues.USERNAME);
+            StaticValues.schedularMap=myDb.readSchedularData(StaticValues.USERNAME);
+        }
+        myDb.printControllerData(StaticValues.USERNAME);
+        myDb.printDeviceData(StaticValues.USERNAME);
+        //myDb.printSchedularData(StaticValues.USERNAME);
         drawerItems.clear();
         StaticValues.controllerList.clear();
         mHandler = new Handler();
@@ -142,11 +152,14 @@ public class MainActivity extends AppCompatActivity {
                 getSelectedFragment();
             }
             else{
-                navItemIndex = 1;
-                StaticValues.controllerName=drawerItems.get(navItemIndex-1);
+                if("".equals(StaticValues.controllerName) || "Logout".equals(StaticValues.controllerName)){
+                    navItemIndex = 1;
+                    StaticValues.controllerName=drawerItems.get(navItemIndex-1);
+                }
                 getSelectedFragment();
             }
         }
+
     }
 
     @Override
@@ -235,10 +248,19 @@ public class MainActivity extends AppCompatActivity {
         else if(StaticValues.controllerName.equals("Schedular")){
             SchedularActivity schedularActivity = new SchedularActivity();
             return schedularActivity;
-    }
+        }
         else if(StaticValues.controllerName.equals("Metrics")){
             MetricsDetailsActivity metricsDetailsActivity = new MetricsDetailsActivity();
             return metricsDetailsActivity;
+        }
+        else if(StaticValues.controllerName.equals("Logout")){
+            DummyActivity dummyActivity = new DummyActivity();
+            //BlankActivity blankActivity=new BlankActivity();
+            SaveSharedPreference.clearUserName(MainActivity.this);
+            myDb.purgeControllerData(StaticValues.USERNAME);
+            myDb.purgeDeviceData(StaticValues.USERNAME);
+            myDb.purgeSchedularData(StaticValues.USERNAME);
+            return dummyActivity;
         }
         else {
             ControllerActivity controllerActivity = new ControllerActivity();

@@ -32,27 +32,31 @@ public class SchedularActivity extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         numberOfSchedules=StaticValues.numberOfSchedules;
+        System.out.println("NUMBER OF SCHEDULES : " + numberOfSchedules);
+        System.out.println(StaticValues.schedularMap);
         View view=inflater.inflate(R.layout.activity_schedular, container, false);
         if(numberOfSchedules>0){
             scheduleDetail=new String[numberOfSchedules];
             updateImageId=new Integer[numberOfSchedules];
             deleteImageId=new Integer[numberOfSchedules];
-
+            position=1;
             Iterator iterator=StaticValues.schedularMap.entrySet().iterator();
 
             while(iterator.hasNext()){
+                System.out.println("SCHEDULE POSITION : " + position);
                 Map.Entry entry= (Map.Entry) iterator.next();
                 scheduleDetails=new HashMap<String, String>();
                 scheduleDetails=(HashMap<String, String>) entry.getValue();
-                position=(int) entry.getKey();
+                //position=(int) entry.getKey();
                 if("1".equals(scheduleDetails.get("status")))
                     action="ON";
                 if("0".equals(scheduleDetails.get("status")))
                     action="OFF";
-                scheduleDetail[position-1]="Bedroom" + " : " + scheduleDetails.get("deviceName")
-                        + "       " + action + "       " + scheduleDetails.get("time");
+                scheduleDetail[position-1]=scheduleDetails.get("controllerName") + " : " + scheduleDetails.get("deviceName")
+                        + "    " + action + "       " + scheduleDetails.get("time");
                 updateImageId[position-1]=R.drawable.deviceoff;
                 deleteImageId[position-1]=R.drawable.deviceoff;
+                position++;
             }
             SchedularList adapter = new
                     SchedularList(SchedularActivity.this.getActivity(), scheduleDetail, updateImageId, deleteImageId);

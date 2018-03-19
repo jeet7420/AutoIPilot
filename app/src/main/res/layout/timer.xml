@@ -74,23 +74,16 @@
         android:id="@+id/row3"
         android:layout_below="@+id/row2">
 
-
         <Button
-            android:layout_width="wrap_content"
-            android:id="@+id/removeTimer"
-            android:text="REMOVE TIMER"
-            android:layout_alignParentLeft="true"
-            android:background="@android:color/transparent"
-            android:textColor="@color/colorBlack"
-            android:layout_height="wrap_content" />
-
-        <Button
-            android:layout_width="wrap_content"
             android:id="@+id/saveTimer"
             android:text="SAVE TIMER"
-            android:layout_alignParentRight="true"
-            android:background="@android:color/transparent"
-            android:textColor="@color/colorBlack"
+            android:background="@color/colorGreyLight"
+            android:textColor="@color/colorWhite"
+            android:layout_below="@+id/etPassword"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="40dp"
+            android:gravity="center"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
     </RelativeLayout>

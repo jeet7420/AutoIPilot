@@ -79,9 +79,16 @@ public class ControllerActivity extends Fragment {
         userId=StaticValues.USERNAME;
         controllerName=StaticValues.controllerName;
         controllerId=StaticValues.getControllerId(controllerName);
+        System.out.println("CONTROLLER ID : " + controllerId);
+        System.out.println("CONTROLLER NAME : " + controllerName);
+        StaticValues.printControllerMap();
+        StaticValues.printDeviceMap();
+        StaticValues.printUpdateControllerMap();
+        StaticValues.printUpdateDeviceMap();
         deviceMapForSelectedController=StaticValues.getDeviceMapForSelectedController(controllerId);
         StaticValues.deviceMapForSelectedController=deviceMapForSelectedController;
         numberOfDevices=deviceMapForSelectedController.size();
+        System.out.println("NUMBER OF DEVICES : " + numberOfDevices);
         deviceName=new String[numberOfDevices];
         deviceId=new String[numberOfDevices];
         Iterator iteratorDeviceMapForSelectedController = deviceMapForSelectedController.entrySet().iterator();
@@ -217,12 +224,17 @@ public class ControllerActivity extends Fragment {
                 btnAddController.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        StaticValues.updateControllerMap=new HashMap<String, String>();
+                        StaticValues.updateDeviceMap=new HashMap<String, String>();
                         editControllerName = etControllerName.getText().toString();
                         editFirstDevice = etFirstDevice.getText().toString();
                         editSecondDevice = etSecondDevice.getText().toString();
+                        StaticValues.controllerName=editControllerName;
                         StaticValues.updateControllerMap.put(controllerId, editControllerName);
                         StaticValues.updateDeviceMap.put(deviceId[0], editFirstDevice);
                         StaticValues.updateDeviceMap.put(deviceId[1], editSecondDevice);
+                        StaticValues.printUpdateControllerMap();
+                        StaticValues.printUpdateDeviceMap();
                         new MyAsyncTask().execute();
                     }
                 });
@@ -324,7 +336,14 @@ public class ControllerActivity extends Fragment {
                         Map.Entry entry=(Map.Entry)iterator.next();
                         myDb.insertDeviceData(entry.getKey().toString(), newControllerNumber, entry.getValue().toString());
                     }
+                    myDb.printControllerData(StaticValues.USERNAME);
+                    myDb.printDeviceData(StaticValues.USERNAME);
+                    myDb.printSchedularData(StaticValues.USERNAME);
                     StaticValues.isUserNew = false;
+                    StaticValues.printControllerMap();
+                    StaticValues.printDeviceMap();
+                    StaticValues.printUpdateControllerMap();
+                    StaticValues.printUpdateDeviceMap();
                 } else
                     Toast.makeText(ControllerActivity.this.getActivity(), "Controller could not be added. Please try again !", Toast.LENGTH_LONG).show();
                 popupWindow.dismiss();
@@ -337,12 +356,24 @@ public class ControllerActivity extends Fragment {
                     System.out.println("Server Result :" + StaticValues.serverResult);
                     StaticValues.controllerMap.put(controllerId, editControllerName);
                     myDb.updateControllerData(controllerId, editControllerName);
+                    System.out.println("CHECK1 : " + controllerId);
                     StaticValues.deviceMap.put(controllerId, StaticValues.updateDeviceMap);
+                    System.out.println("SHEKHAR");
+                    StaticValues.printDeviceMap();
                     Iterator iterator=StaticValues.updateDeviceMap.entrySet().iterator();
                     while(iterator.hasNext()){
+                        System.out.println("CHECK1 : " + controllerId);
                         Map.Entry entry=(Map.Entry)iterator.next();
-                        myDb.insertDeviceData(entry.getKey().toString(), controllerId, entry.getValue().toString());
+                        myDb.updateDeviceData(entry.getKey().toString(), controllerId, entry.getValue().toString());
                     }
+                    myDb.printControllerData(StaticValues.USERNAME);
+                    myDb.printDeviceData(StaticValues.USERNAME);
+                    myDb.printSchedularData(StaticValues.USERNAME);
+                    StaticValues.printControllerMap();
+                    StaticValues.printDeviceMap();
+                    StaticValues.printUpdateControllerMap();
+                    StaticValues.printUpdateDeviceMap();
+                    controllerId = null;
                 } else
                     Toast.makeText(ControllerActivity.this.getActivity(), "Controller could not be updated. Please try again !", Toast.LENGTH_LONG).show();
                 popupWindow.dismiss();

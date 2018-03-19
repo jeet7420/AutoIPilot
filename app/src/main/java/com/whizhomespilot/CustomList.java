@@ -172,8 +172,8 @@ public class CustomList extends ArrayAdapter<String> {
             TextView textView = (TextView) toolbar.findViewById(R.id.tv_toolbar);
             ImageButton closePopup = (ImageButton) toolbar.findViewById(R.id.close_popup);
             Switch toggleButton=(Switch) layout.findViewById(R.id.toggleButton);
+            schedularDetails.put("status", schedularDeviceStatus);
             Button btnSaveTimer=(Button) layout.findViewById(R.id.saveTimer);
-            Button btnRemoveTimer=(Button) layout.findViewById(R.id.removeTimer);
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
             Date dateobj = new Date();
             startDate=df.format(dateobj);
@@ -213,26 +213,13 @@ public class CustomList extends ArrayAdapter<String> {
                     deviceActionMode="E";
                     description="ENABLE SCHEDULAR";
                     StaticValues.schedularMap.put(++StaticValues.numberOfSchedules,schedularDetails);
+                    System.out.println(StaticValues.schedularMap);
                     new MyAsyncTask().execute();
                     v.setSelected(false);
                     popupWindow.dismiss();
                 }
             });
-            btnRemoveTimer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    deviceActionMode="D";
-                    description="DISABLE SCHEDULAR";
-                    startTime="-1";
-                    endTime="-1";
-                    startDate="-1";
-                    endDate="-1";
-                    schedularDeviceStatus="-1";
-                    new MyAsyncTask().execute();
-                    v.setSelected(false);
-                    popupWindow.dismiss();
-                }
-            });
+
             if (toggleButton != null) {
                 toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
@@ -289,7 +276,7 @@ public class CustomList extends ArrayAdapter<String> {
                 }
             }
 
-            if(deviceActionMode.equals("E") || deviceActionMode.equals("D")){
+            if(deviceActionMode.equals("E")){
                 try{
                     HTTPURLConnection httpurlConnection = new HTTPURLConnection();
                     postDataParams=new HashMap<String, String>();
