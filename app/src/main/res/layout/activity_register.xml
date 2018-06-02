@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:background="@color/colorBlack">
+    android:layout_height="match_parent" android:background="@drawable/background">
 
-    <!--<ImageView
+    <ImageView
         android:layout_width="wrap_content"
-        android:src="@drawable/header"
-        android:id="@+id/header"
-        android:layout_marginTop="20dp"
+        android:src="@drawable/splash"
         android:layout_gravity="center"
-        android:layout_height="wrap_content" />-->
+        android:layout_marginTop="30dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent" />
 
     <EditText
         android:layout_width="match_parent"
         android:id="@+id/etEmail"
         android:hint="Email Id"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="80dp"
+        android:backgroundTint="@color/colorWhite"
+        android:textColorHint="@color/colorGreyLight"
         android:textColor="@color/colorWhite"
-        android:textColorHint="@color/colorGreyDark"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_height="wrap_content" />
@@ -26,9 +27,11 @@
         android:layout_width="match_parent"
         android:id="@+id/etPassword"
         android:hint="Password"
+        android:inputType="textPassword"
         android:layout_marginTop="10dp"
+        android:backgroundTint="@color/colorWhite"
+        android:textColorHint="@color/colorGreyLight"
         android:textColor="@color/colorWhite"
-        android:textColorHint="@color/colorGreyDark"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_height="wrap_content" />
@@ -37,8 +40,9 @@
         android:layout_width="match_parent"
         android:id="@+id/etName"
         android:hint="Name"
+        android:backgroundTint="@color/colorWhite"
+        android:textColorHint="@color/colorGreyLight"
         android:textColor="@color/colorWhite"
-        android:textColorHint="@color/colorGreyDark"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
@@ -48,22 +52,22 @@
         android:layout_width="match_parent"
         android:id="@+id/etPhone"
         android:hint="Phone Number"
+        android:backgroundTint="@color/colorWhite"
+        android:textColorHint="@color/colorGreyLight"
         android:textColor="@color/colorWhite"
-        android:textColorHint="@color/colorGreyDark"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_height="wrap_content" />
 
-    <Button
+    <ImageButton
         android:layout_width="match_parent"
-        android:text="REGISTER"
-        android:textColor="@color/colorWhite"
-        android:background="@color/colorRed"
         android:id="@+id/btnRegister"
-        android:layout_marginTop="60dp"
+        android:src="@drawable/login"
+        android:layout_marginTop="70dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent" />
 
 </LinearLayout>

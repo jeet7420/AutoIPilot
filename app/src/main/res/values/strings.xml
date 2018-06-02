@@ -11,6 +11,18 @@
         <item>2018</item>
         <item>2019</item>
     </string-array>
+    <string-array name="controller_names">
+        <item>Bedroom</item>
+        <item>Hall</item>
+        <item>Kitchen</item>
+        <item>Bathroom</item>
+    </string-array>
+    <string-array name="device_names">
+        <item>Fan</item>
+        <item>Light</item>
+        <item>Geysor</item>
+        <item>3-Pin</item>
+    </string-array>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
     <string name="action_settings">Settings</string>
@@ -19,4 +31,6 @@
     <string name="year_prompt">SELECT YEAR</string>
     <string name="app_name">WHIZ HOMES</string>
     <string name="app_not_available">Sorry, there\'s no web browser available</string>
+    <string name="about_us">We are a group of three budding entrepreneurs looking to make a difference</string>
+    <string name="contact_us">JEET   - 8298916264\nSHEKHAR   - 7337367761\nSOUMYAJIT - 9154748948</string>
 </resources>

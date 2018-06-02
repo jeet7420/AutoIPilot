@@ -107,7 +107,7 @@ public class SchedularList extends ArrayAdapter<String> {
                 endDate="-1";
                 schedularDeviceStatus="-1";
                 new MyAsyncTask().execute();
-                StaticValues.removeFromPosition(position);
+                //StaticValues.removeFromPosition(position);
                 //StaticValues.schedularMap.remove(position+1);
                 StaticValues.numberOfSchedules=StaticValues.numberOfSchedules-1;
                 StaticValues.controllerName="Schedular";
@@ -143,15 +143,15 @@ public class SchedularList extends ArrayAdapter<String> {
             ImageButton closePopup = (ImageButton) toolbar.findViewById(R.id.close_popup);
             Switch toggleButton=(Switch) layout.findViewById(R.id.toggleButton);
             System.out.println("SCHEDULAR PRINT POSITION : " + pos);
-            if("0".equals(StaticValues.schedularMap.get(pos+1).get("status"))){
+            /*if("0".equals(StaticValues.schedularMap.get(pos+1).getAction())){
                 toggleButton.setChecked(false);
                 schedularDeviceStatus="0";
-            }
-            if("1".equals(StaticValues.schedularMap.get(pos+1).get("status"))){
+            }*/
+            /*if("1".equals(StaticValues.schedularMap.get(pos+1).getAction())){
                 toggleButton.setChecked(true);
                 schedularDeviceStatus="1";
 
-            }
+            }*/
             schedularDetails.put("status", schedularDeviceStatus);
             Button btnSaveTimer=(Button) layout.findViewById(R.id.saveTimer);
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -170,7 +170,7 @@ public class SchedularList extends ArrayAdapter<String> {
             });
             textView.setText("TIME SCHEDULER DETAILS");
             etTimer=(EditText)layout.findViewById(R.id.editTime);
-            startTime=StaticValues.schedularMap.get(pos+1).get("time");
+            //startTime=StaticValues.schedularMap.get(pos+1).getTime();
             etTimer.setText(startTime);
             schedularDetails.put("time", startTime);
             etTimer.setOnClickListener(new View.OnClickListener() {
@@ -197,7 +197,7 @@ public class SchedularList extends ArrayAdapter<String> {
                 public void onClick(View view) {
                     deviceActionMode="U";
                     description="ENABLE SCHEDULAR";
-                    StaticValues.schedularMap.put(pos+1,schedularDetails);
+                    //StaticValues.schedularMap.put(pos+1,schedularDetails);
                     new SchedularList.MyAsyncTask().execute();
                     v.setSelected(false);
                     popupWindow.dismiss();

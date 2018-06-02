@@ -1,56 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:background="@color/colorWhite"
-    android:id="@+id/popup_element_add">
+    android:layout_height="match_parent" android:background="@drawable/background"
+    android:id="@+id/popup_element_edit">
 
-    <include layout="@layout/toolbar"
-        android:id="@+id/mytoolbar"/>
-
-    <EditText
-        android:id="@+id/etControllerName"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_below="@+id/mytoolbar"
-        android:hint="Controller Name"
-        android:layout_gravity="center_horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <EditText
-        android:id="@+id/etFirstDevice"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_below="@+id/etControllerName"
-        android:hint="First Device Name"
-        android:layout_gravity="center_horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <EditText
-        android:id="@+id/etSecondDevice"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:hint="Second Device Name"
-        android:layout_below="@+id/etFirstDevice"
-        android:layout_gravity="center_horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/btnSave"
-        android:text="Save"
-        android:background="@color/colorGreyLight"
+    <AutoCompleteTextView
+        android:id="@+id/actvControllerName"
+        android:layout_marginTop="100dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:backgroundTint="@color/colorWhite"
+        android:textColorHint="@color/colorWhite"
         android:textColor="@color/colorWhite"
-        android:layout_below="@+id/etSecondDevice"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="40dp"
-        android:gravity="center"
-        android:layout_gravity=""
+        android:layout_below="@+id/etControllerNumber"
+        android:hint="Enter Controller Name"
+        android:layout_gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-</RelativeLayout>
+    <AutoCompleteTextView
+        android:id="@+id/actvFirstDeviceName"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:backgroundTint="@color/colorWhite"
+        android:textColorHint="@color/colorWhite"
+        android:textColor="@color/colorWhite"
+        android:layout_below="@+id/etControllerNumber"
+        android:hint="Enter First Device Name"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <AutoCompleteTextView
+        android:id="@+id/actvSecondDeviceName"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:backgroundTint="@color/colorWhite"
+        android:textColorHint="@color/colorWhite"
+        android:textColor="@color/colorWhite"
+        android:layout_below="@+id/etControllerNumber"
+        android:hint="Enter Second Device Name"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ImageButton
+        android:layout_width="match_parent"
+        android:id="@+id/btnAddController"
+        android:src="@drawable/login"
+        android:layout_marginTop="100dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent" />
+
+</LinearLayout>

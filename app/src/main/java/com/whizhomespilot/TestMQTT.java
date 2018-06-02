@@ -11,7 +11,7 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 public class TestMQTT {
     MemoryPersistence persistence = new MemoryPersistence();
     MqttClient client;
-    public void doDemo(String topic,String status,String deviceID) {
+    public void doDemo(String topic,String status,String deviceId, String securityToken) {
         try {
             // System.setProperty("http.proxyHost", "www-proxy.idc.oracle.com");
             //  System.setProperty("http.proxyPort", "80");
@@ -19,7 +19,7 @@ public class TestMQTT {
             client = new MqttClient("tcp://45.113.138.18:1883", topic,persistence);
             client.connect();
             MqttMessage message = new MqttMessage();
-            message.setPayload((status).getBytes());
+            message.setPayload((securityToken+"-"+deviceId+status).getBytes());
             client.publish(topic, message);
             client.disconnect();
             System.out.println("After");

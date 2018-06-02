@@ -1,5 +1,6 @@
 package com.whizhomespilot;
 
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
@@ -36,17 +37,17 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
-    private ActionBarDrawerToggle mDrawerToggle;
-    DatabaseHelper myDb;
-    private CharSequence mDrawerTitle;
-    private CharSequence mTitle;
-    private String[] mControllerTitles;
-    public static int navItemIndex = 0;
-    private Handler mHandler;
     public static ArrayList<String> drawerItems=new ArrayList<String>();
     public static List<String> drawerStaticItems=new ArrayList<String>();
+    private ActionBarDrawerToggle mDrawerToggle;
+    private DrawerLayout mDrawerLayout;
+    private String[] mControllerTitles;
+    public static int navItemIndex = 0;
+    private CharSequence mDrawerTitle;
+    private ListView mDrawerList;
+    private CharSequence mTitle;
+    private Handler mHandler;
+    DatabaseHelper myDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,19 +65,24 @@ public class MainActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
         // finally change the color
-        window.setStatusBarColor(ContextCompat.getColor(MainActivity.this,R.color.colorBlack));
+        window.setStatusBarColor(ContextCompat.getColor(MainActivity.this,R.color.colorTheme));
         myDb = new DatabaseHelper(this);
         if(!StaticValues.loginUsed){
             StaticValues.USERNAME=SaveSharedPreference.getUserName(MainActivity.this);
             StaticValues.controllerMap=myDb.readControllerData(StaticValues.USERNAME);
             StaticValues.deviceMap=myDb.readDeviceData(StaticValues.USERNAME);
-            StaticValues.schedularMap=myDb.readSchedularData(StaticValues.USERNAME);
+            //StaticValues.schedularMap=myDb.readSchedularData(StaticValues.USERNAME);
+            StaticValues.statusMap=myDb.readStatusData(StaticValues.USERNAME);
+            StaticValues.securityMap=myDb.readSecurityData(StaticValues.USERNAME);
+            StaticValues.topicMap=myDb.readTopicData(StaticValues.USERNAME);
         }
         myDb.printControllerData(StaticValues.USERNAME);
         myDb.printDeviceData(StaticValues.USERNAME);
+        myDb.printStatusData(StaticValues.USERNAME);
         //myDb.printSchedularData(StaticValues.USERNAME);
         drawerItems.clear();
         StaticValues.controllerList.clear();
+        StaticValues.controllerList.add(StaticValues.ADDNEWCONTROLLER);
         mHandler = new Handler();
         mTitle = mDrawerTitle = getTitle();
         mControllerTitles = getResources().getStringArray(R.array.controller_array);
@@ -111,11 +117,12 @@ public class MainActivity extends AppCompatActivity {
         //getSupportActionBar().setLogo(R.drawable.smb);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.sidemenubutton);
         //getSupportActionBar().setTitle(R.string.main_activity_title);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorBlack)));
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorTheme)));
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.actionbar);
         TextView title=(TextView)findViewById(getResources().getIdentifier("action_bar_title", "id", getPackageName()));
-        title.setText("WHIZ HOMES");
+        title.setText("AUTOI");
+        title.setTypeface(null, Typeface.BOLD);
         title.setPadding(0,0,110,0);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -154,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
             else{
                 if("".equals(StaticValues.controllerName) || "Logout".equals(StaticValues.controllerName)){
                     navItemIndex = 1;
-                    StaticValues.controllerName=drawerItems.get(navItemIndex-1);
+                    StaticValues.controllerName=drawerItems.get(navItemIndex);
                 }
                 getSelectedFragment();
             }
@@ -245,8 +252,16 @@ public class MainActivity extends AppCompatActivity {
             BlankActivity blankActivity=new BlankActivity();
             return blankActivity;
         }
+        else if(StaticValues.controllerName.equals(StaticValues.ADDNEWCONTROLLER)){
+            AddControllerActivity addControllerActivity = new AddControllerActivity();
+            return addControllerActivity;
+        }
+        else if(StaticValues.controllerName.equals(StaticValues.EDITCONTROLLER)){
+            EditControllerActivity editControllerActivity = new EditControllerActivity();
+            return editControllerActivity;
+        }
         else if(StaticValues.controllerName.equals("Schedular")){
-            SchedularActivity schedularActivity = new SchedularActivity();
+            SchedularGridActivity schedularActivity = new SchedularGridActivity();
             return schedularActivity;
         }
         else if(StaticValues.controllerName.equals("Metrics")){
@@ -260,7 +275,16 @@ public class MainActivity extends AppCompatActivity {
             myDb.purgeControllerData(StaticValues.USERNAME);
             myDb.purgeDeviceData(StaticValues.USERNAME);
             myDb.purgeSchedularData(StaticValues.USERNAME);
+            myDb.purgeStatusData(StaticValues.USERNAME);
             return dummyActivity;
+        }
+        else if(StaticValues.controllerName.equals("About Us")){
+            AboutUsActivity aboutUsActivity = new AboutUsActivity();
+            return aboutUsActivity;
+        }
+        else if(StaticValues.controllerName.equals("Contact Us")){
+            ContactUsActivity contactUsActivity = new ContactUsActivity();
+            return contactUsActivity;
         }
         else {
             ControllerActivity controllerActivity = new ControllerActivity();

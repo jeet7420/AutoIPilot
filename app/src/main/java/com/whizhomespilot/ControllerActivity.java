@@ -6,6 +6,8 @@ package com.whizhomespilot;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -57,13 +59,13 @@ public class ControllerActivity extends Fragment {
     String[] deviceId;
     EditText etControllerName, etFirstDevice, etSecondDevice;
     Integer[] imageId = {
-            R.drawable.light,
-            R.drawable.light
+            R.drawable.fan,
+            R.drawable.light1
     };
 
     Integer[] deviceStatusImage = {
-            R.drawable.deviceoff,
-            R.drawable.deviceoff
+            R.drawable.deviceon1,
+            R.drawable.deviceoff1
     };
 
     @Override
@@ -79,6 +81,7 @@ public class ControllerActivity extends Fragment {
         userId=StaticValues.USERNAME;
         controllerName=StaticValues.controllerName;
         controllerId=StaticValues.getControllerId(controllerName);
+        StaticValues.controllerId=controllerId;
         System.out.println("CONTROLLER ID : " + controllerId);
         System.out.println("CONTROLLER NAME : " + controllerName);
         StaticValues.printControllerMap();
@@ -100,11 +103,74 @@ public class ControllerActivity extends Fragment {
                 position++;
             }
         }
+
+        for(int i=0; i<numberOfDevices; i++){
+            if("Fan".equals(deviceName[i])){
+                imageId[i]=R.drawable.fan;
+            }
+            else if("Light".equals(deviceName[i])){
+                imageId[i]=R.drawable.light1;
+            }
+            else if("Geysor".equals(deviceName[i])){
+                imageId[i]=R.drawable.geysor;
+            }
+            else if("3-Pin".equals(deviceName[i])){
+                imageId[i]=R.drawable.pin;
+            }
+            else{
+                imageId[i]=R.drawable.fan;
+            }
+        }
+
+        for(int i=0; i<numberOfDevices; i++){
+            if("0".equals(StaticValues.statusMap.get(deviceId[i]))){
+                deviceStatusImage[i]=R.drawable.deviceoff1;
+            }
+            else{
+                deviceStatusImage[i]=R.drawable.deviceon1;
+            }
+        }
+
         View view=inflater.inflate(R.layout.activity_controller, container, false);
-        TextView tvHeader=(TextView)view.findViewById(R.id.header);
+        ImageButton roomWall=(ImageButton)view.findViewById(R.id.imagebutton1);
+        if("Bedroom".equals(StaticValues.controllerName)){
+            roomWall.setBackground(getResources().getDrawable(R.drawable.bedroomwall));
+        }
+
+        else if("Hall".equals(StaticValues.controllerName)){
+            roomWall.setBackground(getResources().getDrawable(R.drawable.bedroomwall));
+        }
+
+        else if("Kitchen".equals(StaticValues.controllerName)){
+            roomWall.setBackground(getResources().getDrawable(R.drawable.bedroomwall));
+        }
+
+        else if("Bathroom".equals(StaticValues.controllerName)){
+            roomWall.setBackground(getResources().getDrawable(R.drawable.bedroomwall));
+        }
+
+        else{
+            roomWall.setBackground(getResources().getDrawable(R.drawable.bedroomwall));
+        }
+
+        StaticValues.firstDevice=deviceName[0];
+        StaticValues.secondDevice=deviceName[1];
+        StaticValues.firstDeviceId=deviceId[0];
+        StaticValues.secondDeviceId=deviceId[1];
+
+        roomWall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StaticValues.controller=StaticValues.controllerName;
+                StaticValues.controllerName=StaticValues.EDITCONTROLLER;
+                Intent reloadMainActivity = new Intent(ControllerActivity.this.getActivity(),MainActivity.class);
+                ControllerActivity.this.getActivity().startActivity(reloadMainActivity);
+            }
+        });
+        //TextView tvHeader=(TextView)view.findViewById(R.id.header);
         System.out.println("CONTROLLER : " + StaticValues.controllerName);
-        tvHeader.setText(StaticValues.controllerName);
-        tvHeader.setEnabled(true);
+        //tvHeader.setText(StaticValues.controllerName);
+        //tvHeader.setEnabled(true);
         CustomList adapter = new
                 CustomList(ControllerActivity.this.getActivity(), deviceName, imageId, deviceStatusImage);
         //list=(ListView)getActivity().findViewById(R.id.list);
@@ -119,15 +185,15 @@ public class ControllerActivity extends Fragment {
             }
         });*/
         ImageButton addControllerBtn=(ImageButton)view.findViewById(R.id.addControllerButton);
-        addControllerBtn.setImageResource(R.drawable.addcontroller);
+        addControllerBtn.setImageResource(R.drawable.add);
         addControllerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 popupAction=addAction;
-                initiatePopupWindow(view);
+                //initiatePopupWindow(view);
             }
         });
-        ImageButton editControllerBtn=(ImageButton)view.findViewById(R.id.editControllerButton);
+        /*ImageButton editControllerBtn=(ImageButton)view.findViewById(R.id.editControllerButton);
         editControllerBtn.setImageResource(R.drawable.update);
         editControllerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,117 +201,9 @@ public class ControllerActivity extends Fragment {
                 popupAction=editAction;
                 initiatePopupWindow(view);
             }
-        });
+        });*/
         // Inflate the layout for this fragment
         return view;
-    }
-    private void initiatePopupWindow(View v) {
-        try {
-            if(popupAction.equals(addAction)) {
-                layout = (RelativeLayout) v.findViewById(R.id.popup_element_add);
-                //We need to get the instance of the LayoutInflater, use the context of this activity
-                layoutInflator = (LayoutInflater) ControllerActivity.this.getActivity()
-                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                //Inflate the view from a predefined XML layout
-                final View layout = layoutInflator.inflate(R.layout.activity_addcontroller,
-                        (ViewGroup) v.findViewById(R.id.popup_element_add));
-
-                popupWindow = new PopupWindow(layout, 1000, 1000, true);
-                popupWindow.showAtLocation(layout, Gravity.CENTER, 0, 0);
-                popupWindow.setFocusable(true);
-            /*layout.setOnTouchListener(new View.OnTouchListener(){
-                @Override
-                public boolean onTouch(View view, MotionEvent motionEvent){
-                    popupWindow.dismiss();
-                    return true;
-                }
-            });*/
-                Toolbar toolbar = (Toolbar) layout.findViewById(R.id.mytoolbar);
-                TextView textView = (TextView) toolbar.findViewById(R.id.tv_toolbar);
-                ImageButton closePopup = (ImageButton) toolbar.findViewById(R.id.close_popup);
-                closePopup.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        popupWindow.dismiss();
-                    }
-                });
-                textView.setText("NEW CONTROLLER DETAILS");
-                Button btnAddController = (Button) layout.findViewById(R.id.btnAddController);
-                btnAddController.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        EditText etControllerNumber = (EditText) layout.findViewById(R.id.etControllerNumber);
-                        newControllerNumber = etControllerNumber.getText().toString();
-                        EditText etControllerName = (EditText) layout.findViewById(R.id.etControllerName);
-                        newControllerName = etControllerName.getText().toString();
-                        EditText etPassKey = (EditText) layout.findViewById(R.id.etPassKey);
-                        newPassKey = etPassKey.getText().toString();
-                        new MyAsyncTask().execute();
-                    }
-                });
-            }
-
-            if(popupAction.equals(editAction)) {
-                layout = (RelativeLayout) v.findViewById(R.id.popup_element_edit);
-                //We need to get the instance of the LayoutInflater, use the context of this activity
-                layoutInflator = (LayoutInflater) ControllerActivity.this.getActivity()
-                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                //Inflate the view from a predefined XML layout
-                final View layout = layoutInflator.inflate(R.layout.activity_editcontroller,
-                        (ViewGroup) v.findViewById(R.id.popup_element_edit));
-
-                popupWindow = new PopupWindow(layout, 1000, 1000, true);
-                popupWindow.showAtLocation(layout, Gravity.CENTER, 0, 0);
-                popupWindow.setFocusable(true);
-            /*layout.setOnTouchListener(new View.OnTouchListener(){
-                @Override
-                public boolean onTouch(View view, MotionEvent motionEvent){
-                    popupWindow.dismiss();
-                    return true;
-                }
-            });*/
-                Toolbar toolbar = (Toolbar) layout.findViewById(R.id.mytoolbar);
-                TextView textView = (TextView) toolbar.findViewById(R.id.tv_toolbar);
-                ImageButton closePopup = (ImageButton) toolbar.findViewById(R.id.close_popup);
-                closePopup.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        popupWindow.dismiss();
-                    }
-                });
-                textView.setText("EDIT CONTROLLER DETAILS");
-                etControllerName = (EditText) layout.findViewById(R.id.etControllerName);
-                etFirstDevice = (EditText) layout.findViewById(R.id.etFirstDevice);
-                etSecondDevice = (EditText) layout.findViewById(R.id.etSecondDevice);
-                etControllerName.setText(controllerName);
-                etFirstDevice.setText(deviceName[0]);
-                etSecondDevice.setText(deviceName[1]);
-                Button btnAddController = (Button) layout.findViewById(R.id.btnSave);
-                btnAddController.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        StaticValues.updateControllerMap=new HashMap<String, String>();
-                        StaticValues.updateDeviceMap=new HashMap<String, String>();
-                        editControllerName = etControllerName.getText().toString();
-                        editFirstDevice = etFirstDevice.getText().toString();
-                        editSecondDevice = etSecondDevice.getText().toString();
-                        StaticValues.controllerName=editControllerName;
-                        StaticValues.updateControllerMap.put(controllerId, editControllerName);
-                        StaticValues.updateDeviceMap.put(deviceId[0], editFirstDevice);
-                        StaticValues.updateDeviceMap.put(deviceId[1], editSecondDevice);
-                        StaticValues.printUpdateControllerMap();
-                        StaticValues.printUpdateDeviceMap();
-                        new MyAsyncTask().execute();
-                    }
-                });
-            }
-            //TextView mResultText = (TextView) layout.findViewById(R.id.server_status_text);
-            //Button cancelButton = (Button) layout.findViewById(R.id.end_data_send_button);
-            //cancelButton.setOnClickListener(cancel_button_click_listener);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public static HashMap<String, HashMap<String,String>> jsonToHashMap(JSONObject object) throws JSONException {

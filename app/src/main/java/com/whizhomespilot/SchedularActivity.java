@@ -33,14 +33,14 @@ public class SchedularActivity extends Fragment {
                              Bundle savedInstanceState) {
         numberOfSchedules=StaticValues.numberOfSchedules;
         System.out.println("NUMBER OF SCHEDULES : " + numberOfSchedules);
-        System.out.println(StaticValues.schedularMap);
+        System.out.println(StaticValues.schedules);
         View view=inflater.inflate(R.layout.activity_schedular, container, false);
         if(numberOfSchedules>0){
             scheduleDetail=new String[numberOfSchedules];
             updateImageId=new Integer[numberOfSchedules];
             deleteImageId=new Integer[numberOfSchedules];
             position=1;
-            Iterator iterator=StaticValues.schedularMap.entrySet().iterator();
+            Iterator iterator=StaticValues.schedules.iterator();
 
             while(iterator.hasNext()){
                 System.out.println("SCHEDULE POSITION : " + position);

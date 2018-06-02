@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -17,15 +18,15 @@ import java.util.TreeMap;
  */
 
 public class StaticValues {
-    public static final String loginURL="http://www.whizindia.com/rest/login/authenticateUserWH";
-    public static final String authURL="http://www.whizindia.com/rest/login/authenticateToken";
-    public static final String registerURL="http://www.whizindia.com/rest/register/registerMemberWH";
-    public static final String deviceActionURL="http://www.whizindia.com/rest/action/deviceWH";
-    public static final String addControllerURL="http://www.whizindia.com/rest/controller/verifyController";
-    public static final String editControllerURL="http://www.whizindia.com/rest/controller/updateController";
-    public static final String getMetricsURL="http://www.whizindia.com/rest/action/getMetrics";
-    public static final String googleSignInURL="http://www.whizindia.com/rest/register/googleSingInWH";
-    public static final String scheduleDeviceURL="http://www.whizindia.com/rest/controller/scheduleDevice";
+    public static final String loginURL="http://www.autoitechnologies.com/rest/login/authenticateUserWH";
+    public static final String authURL="http://www.autoitechnologies.com/rest/login/authenticateToken";
+    public static final String registerURL="http://www.autoitechnologies.com/rest/register/registerMemberWH";
+    public static final String deviceActionURL="http://www.autoitechnologies.com/rest/action/deviceWH";
+    public static final String addControllerURL="http://www.autoitechnologies.com/rest/controller/verifyController";
+    public static final String editControllerURL="http://www.autoitechnologies.com/rest/controller/updateController";
+    public static final String getMetricsURL="http://www.autoitechnologies.com/rest/action/getMetrics";
+    public static final String googleSignInURL="http://www.autoitechnologies.com/rest/register/googleSingInWH";
+    public static final String scheduleDeviceURL="http://www.autoitechnologies.com/rest/controller/scheduleDevice";
     public static final String registerLocalURL="http://localhost:8032/SmHome/rest/register/registerMemberWH";
     public static Context globalRoomContext;
     public static Intent globalRoomIntent;
@@ -51,6 +52,11 @@ public class StaticValues {
     public static final String authServiceResponseIssue="AUTHORIZE TOKEN SERVICE RESPONSE ISSUE";
     public static final String registerServiceResponseIssue="REGISTER SERVICE RESPONSE ISSUE";
     public static final String deviceActionResponseIssue="DEVICE ACTION RESPONSE ISSUE";
+
+    public static final String ADDNEWCONTROLLER="Add New Controller";
+    public static final String EDITCONTROLLER="Edit Controller";
+
+    public static String controller, firstDevice, secondDevice, firstDeviceId, secondDeviceId;
 
     public static String USERNAME="";
     public static final String SOURCEMANUAL="USER";
@@ -119,7 +125,11 @@ public class StaticValues {
     public static HashMap<String, String> deviceMapForSelectedController=new HashMap<String, String>();
     public static HashMap<String, String> updateControllerMap=new HashMap<String, String>();
     public static HashMap<String, String> updateDeviceMap=new HashMap<String, String>();
-    public static LinkedHashMap<Integer, HashMap<String,String>> schedularMap=new LinkedHashMap<Integer, HashMap<String,String>>();
+    public static HashMap<String, String> statusMap=new HashMap<String, String>();
+    public static HashMap<String, String> securityMap=new HashMap<String, String>();
+    public static HashMap<String, String> topicMap=new HashMap<String, String>();
+    //public static TreeMap<Integer, Schedule> schedularMap=new TreeMap<Integer, Schedule>();
+    public static LinkedHashSet<Schedule> schedules=new LinkedHashSet<Schedule>();
     public static int numberOfSchedules=0;
     public static boolean loginUsed=false;
     public static JSONObject metricsData;
@@ -177,7 +187,17 @@ public class StaticValues {
         System.out.println(StaticValues.updateDeviceMap);
     }
 
-    public static void removeFromPosition(int position){
+    public static Schedule getScheduleAtPosition(int position){
+        int count=0;
+        for(Schedule s : schedules){
+            if(count==position)
+                return s;
+            count++;
+        }
+        return null;
+    }
+
+    /*public static void removeFromPosition(int position){
         Iterator schedularIterator=StaticValues.schedularMap.entrySet().iterator();
         int count=0;
         int key=-1;
@@ -190,5 +210,5 @@ public class StaticValues {
         }
         if(key>0)
             StaticValues.schedularMap.remove(key);
-    }
+    }*/
 }

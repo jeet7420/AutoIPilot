@@ -5,9 +5,12 @@
     <color name="colorAccent">#FF4081</color>
     <color name="colorBlack">#000000</color>
     <color name="colorTeal">#009688</color>
+    <color name="colorTheme">#00ab9c</color>
     <color name="colorTealDark">#004D40</color>
     <color name="colorTealLight">#00695C</color>
-    <color name="colorGreyLight">#fc353333</color>
+    <color name="colorGreyLight">#BDBDBD</color>
+    <color name="colorGreyLighter">#EEEEEE</color>
+    <color name="colorGreyGrid">#EEEEEE</color>
     <color name="colorGreyDark">#424242</color>
     <color name="colorGrey">#282A29</color>
     <color name="colorWhite">#FFFFFF</color>
@@ -16,4 +19,5 @@
     <color name="colorSelected">#B43840</color>
     <color name="colorGreyOrignal">#FF4081</color>
     <color name="colorCyan">#00838F</color>
+    <color name="transparent">#00000000</color>
 </resources>

@@ -7,13 +7,20 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ListPopupWindow;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -48,19 +55,26 @@ import java.util.Map;
 public class MetricsDetailsActivity extends Fragment {
     Context context;
     List<String> deviceList=new ArrayList<String>();
-    ArrayAdapter<String> adapter;
+    ArrayAdapter<String> roomsAdapter, devicesAdapter;
     HashMap<String, String> postDataParams;
-    Spinner spinnerController, spinnerDevice, spinnerYear;
-    Button btnSubmit;
+    Spinner spinnerController, spinnerDevice, spinnerYear, spinnerControllerNames;
+    ImageButton btnSubmit;
     String selectedController=" ";
     String selectedDevice, selectedYear;
     String controllerId, deviceId;
+    String controllerType;
     JSONObject jsonResponse, jsonObject;
     String response="success";
     HashMap<String, String> deviceMapForSelectedController=new HashMap<String, String>();
     private CombinedChart mChart;
     protected String[] mMonths = new String[12];
     private String[] mYear;
+    private String[] mControllerNames;
+    ImageView chartImage;
+    ListPopupWindow listPopupForRooms;
+    ListPopupWindow listPopupForDevices;
+    String selectedControllerId, selectedControllerName, selectedDeviceId, selectedDeviceName;
+    HashMap<String,String> getDeviceMapForSelectedController=new HashMap<String,String>();
 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,80 +84,78 @@ public class MetricsDetailsActivity extends Fragment {
                              Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.activity_select_details_for_metrics, container, false);
         context=this.getActivity();
-        spinnerController=(Spinner)view.findViewById(R.id.spinnerController);
-        spinnerDevice=(Spinner)view.findViewById(R.id.spinnerDevice);
-        spinnerYear=(Spinner)view.findViewById(R.id.spinnerYear);
-        spinnerController.setPrompt("SELECT CONTROLLER");
-        spinnerDevice.setPrompt("SELECT DEVICE");
-        spinnerYear.setPrompt("SELECT YEAR");
         mYear = getResources().getStringArray(R.array.year_array);
-        adapter = new ArrayAdapter<String>(
-                this.getActivity(), android.R.layout.select_dialog_singlechoice, mYear);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerYear.setAdapter(adapter);
-        btnSubmit=(Button)view.findViewById(R.id.btnSubmit);
-        mChart = (CombinedChart)view. findViewById(R.id.chart1);
+        btnSubmit=(ImageButton)view.findViewById(R.id.btnSubmit);
+        mChart = (CombinedChart)view.findViewById(R.id.chart1);
         mChart.setVisibility(View.INVISIBLE);
+        mChart.setEnabled(false);
         mChart.setTouchEnabled(false);
-        adapter = new ArrayAdapter<String>(
-                this.getActivity(), android.R.layout.select_dialog_singlechoice, StaticValues.controllerList);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerController.setAdapter(adapter);
+        View C = view.findViewById(R.id.chart1);
+        ViewGroup parent = (ViewGroup) C.getParent();
+        int index = parent.indexOfChild(C);
+        parent.removeView(C);
+        ImageButton btnRooms=(ImageButton)view.findViewById(R.id.btnRooms);
+        ImageButton btnDevices=(ImageButton)view.findViewById(R.id.btnDevices);
 
-        spinnerController.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        listPopupForRooms = new ListPopupWindow(this.getActivity());
+        listPopupForDevices = new ListPopupWindow(this.getActivity());
+
+        listPopupForRooms.setAnchorView(btnRooms);
+        listPopupForDevices.setAnchorView(btnDevices);
+
+        roomsAdapter = new ArrayAdapter<String>(
+                this.getActivity(), android.R.layout.simple_spinner_dropdown_item, StaticValues.controllerList);
+        listPopupForRooms.setAdapter(roomsAdapter);
+
+        btnRooms.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                deviceList.clear();
-                selectedController=spinnerController.getSelectedItem().toString();
-                controllerId=StaticValues.getControllerId(selectedController);
-                deviceMapForSelectedController=StaticValues.getDeviceMapForSelectedController(controllerId);
-                Iterator iteratorDeviceMapForSelectedController = deviceMapForSelectedController.entrySet().iterator();
-                while (iteratorDeviceMapForSelectedController.hasNext()) {
-                    Map.Entry entry = (Map.Entry)iteratorDeviceMapForSelectedController.next();
-                    deviceList.add(entry.getValue().toString());
-                }
-                //deviceList=new ArrayList<String>(StaticValues.deviceMap.get(selectedController).values());
-
-                adapter = new ArrayAdapter<String>(
-                        context, android.R.layout.select_dialog_singlechoice, deviceList);
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinnerDevice.setAdapter(adapter);
-                System.out.println("SELECTED CONTROLLER : " + selectedController);
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
+            public void onClick(View view) {
+                listPopupForRooms.show();
             }
         });
 
-        spinnerDevice.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        btnDevices.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                selectedDevice=spinnerDevice.getSelectedItem().toString();
-                deviceId=StaticValues.getDeviceId(selectedDevice, deviceMapForSelectedController);
-                System.out.println("SELECTED DEVICE : " + selectedDevice);
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
+            public void onClick(View view) {
+                listPopupForDevices.show();
             }
         });
 
-        spinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        listPopupForRooms.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                selectedYear=spinnerYear.getSelectedItem().toString();
-                System.out.println("SELECTED YEAR : " + selectedYear);
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                StaticValues.deviceList.clear();
+                selectedControllerName=StaticValues.controllerList.get(i);
+                listPopupForRooms.dismiss();
             }
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
+        });
 
+        listPopupForRooms.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                selectedControllerId=StaticValues.getControllerId(selectedControllerName);
+                getDeviceMapForSelectedController=StaticValues.getDeviceMapForSelectedController(selectedControllerId);
+                StaticValues.deviceList.addAll(getDeviceMapForSelectedController.values());
+                devicesAdapter = new ArrayAdapter<String>(
+                        context, android.R.layout.simple_spinner_dropdown_item, StaticValues.deviceList);
+                listPopupForDevices.setAdapter(devicesAdapter);
+            }
+        });
+
+        listPopupForDevices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                selectedDeviceName=StaticValues.deviceList.get(i);
+                selectedDeviceId=StaticValues.getDeviceId(selectedDeviceName, getDeviceMapForSelectedController);
+                listPopupForDevices.dismiss();
             }
         });
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                chartImage.setEnabled(false);
+                mChart.setEnabled(true);
                 new MyAsyncTask().execute();
             }
         });

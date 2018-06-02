@@ -12,25 +12,29 @@
         android:orientation="horizontal"
         android:id="@+id/row1"
         android:weightSum="10"
-        android:layout_marginTop="30dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/mytoolbar"
-        android:layout_height="wrap_content">
+        android:layout_alignLeft="@+id/row2"
+        android:layout_alignStart="@+id/row2">
 
         <TextView
             android:layout_width="wrap_content"
             android:id="@+id/deviceAction"
             android:layout_weight="7"
+            android:layout_gravity="center_vertical"
             android:text="DEVICE ACTION"
             android:layout_height="wrap_content" />
 
-        <Switch
+        <ImageButton
             android:layout_width="wrap_content"
             android:id="@+id/toggleButton"
             android:layout_weight="3"
-            android:layout_marginLeft="10dp"
-            android:layout_height="wrap_content" />
+            android:src="@drawable/deviceon1"
+            android:layout_marginLeft="20dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:background="@android:color/transparent"/>
 
     </LinearLayout>
 
@@ -39,7 +43,6 @@
         android:orientation="horizontal"
         android:id="@+id/row2"
         android:weightSum="10"
-        android:layout_marginTop="10dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_below="@+id/row1"
@@ -65,25 +68,22 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal"
-        android:layout_alignParentBottom="true"
+        android:background="@drawable/background"
         android:id="@+id/row3"
         android:layout_below="@+id/row2">
 
         <Button
             android:id="@+id/saveTimer"
             android:text="SAVE TIMER"
-            android:background="@color/colorGreyLight"
             android:textColor="@color/colorWhite"
             android:layout_below="@+id/etPassword"
-            android:layout_alignParentBottom="true"
-            android:layout_marginTop="40dp"
             android:gravity="center"
-            android:layout_width="match_parent"
+            android:textSize="15dp"
+            android:background="@drawable/background"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
     </RelativeLayout>

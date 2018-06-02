@@ -2,14 +2,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:weightSum="10"
-    android:layout_height="match_parent" android:background="@color/colorRed">
+    android:layout_height="match_parent" android:background="@color/colorWhite">
 
     <TextView
         android:id="@+id/header"
-        android:background="@color/colorRed"
-        android:textColor="@color/colorWhite"
+        android:background="@color/colorWhite"
+        android:textColor="@color/colorTeal"
         android:textSize="15dp"
-        android:text="NO CONTROLLERS ADDED. PLEASE USE BELOW PLUS SIGN TO ADD NEW CONTROLLER"
+        android:text="NO CONTROLLERS ADDED. PLEASE USE BELOW PLUS BUTTON TO ADD NEW CONTROLLER"
         android:gravity="center_horizontal"
         android:paddingTop="30dp"
         android:layout_width="match_parent"
@@ -17,14 +17,10 @@
 
     <ImageButton
         android:id="@+id/addControllerButton"
-        android:scaleType="fitEnd"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:paddingRight="10dp"
         android:paddingBottom="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorRed" />
+        android:background="@color/colorWhite" />
 
 </RelativeLayout>

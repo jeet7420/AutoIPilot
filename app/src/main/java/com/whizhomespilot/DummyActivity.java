@@ -14,7 +14,6 @@ import android.widget.ImageButton;
  */
 
 public class DummyActivity extends Fragment {
-    String newControllerNumber, newControllerName, newPassKey, response;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

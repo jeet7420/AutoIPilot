@@ -15,6 +15,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,7 +33,7 @@ public class RegisterActivity extends AppCompatActivity {
     EditText etName, etPassword, etEmail, etPhone;
     String name, password, email, phone, homeId, response;
     JSONObject jsonResponse;
-    Button btnRegister;
+    ImageButton btnRegister;
     public static final String mode="C";
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -49,15 +50,15 @@ public class RegisterActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
 // finally change the color
-        window.setStatusBarColor(ContextCompat.getColor(RegisterActivity.this,R.color.colorBlack));
+        window.setStatusBarColor(ContextCompat.getColor(RegisterActivity.this,R.color.colorTeal));
 
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorBlack)));
+        /*getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorBlack)));
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.actionbar);
         TextView title=(TextView)findViewById(getResources().getIdentifier("action_bar_title", "id", getPackageName()));
         title.setText("WHIZ HOMES");
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);*/
 
         Intent accessTokenIntent=getIntent();
         homeId=accessTokenIntent.getStringExtra("homeId");
@@ -67,7 +68,7 @@ public class RegisterActivity extends AppCompatActivity {
         etEmail=(EditText)findViewById(R.id.etEmail);
         etPhone=(EditText)findViewById(R.id.etPhone);
 
-        btnRegister=(Button)findViewById(R.id.btnRegister);
+        btnRegister=(ImageButton)findViewById(R.id.btnRegister);
 
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,6 +133,7 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "USER ALREADY REGISTERED", Toast.LENGTH_LONG).show();
                 }
                 else if(result.equals("1")){
+                    StaticValues.isUserNew=true;
                     Intent registerIntent=new Intent(RegisterActivity.this,MainActivity.class);
                     RegisterActivity.this.startActivity(registerIntent);
                     Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();

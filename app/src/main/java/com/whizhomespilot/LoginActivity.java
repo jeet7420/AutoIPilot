@@ -1,12 +1,15 @@
 package com.whizhomespilot;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -55,7 +58,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     String username, password, response;
     JSONObject jsonResponse, jsonObject;
     public static String mode="C";
-    Button btnLogin;
+    ImageButton btnLogin;
     Context mContext;
     DatabaseHelper myDb;
 
@@ -72,15 +75,15 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
 // finally change the color
-        window.setStatusBarColor(ContextCompat.getColor(LoginActivity.this,R.color.colorBlack));
+        window.setStatusBarColor(ContextCompat.getColor(LoginActivity.this,R.color.colorTeal));
 
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorBlack)));
+        /*getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorBlack)));
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.actionbar);
         TextView title=(TextView)findViewById(getResources().getIdentifier("action_bar_title", "id", getPackageName()));
-        title.setText("WHIZ HOMES");
+        title.setText("WHIZ HOMES");*/
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        //getSupportActionBar().setHomeButtonEnabled(true);
         myDb = new DatabaseHelper(this);
 
         myDb.purgeControllerData(StaticValues.USERNAME);
@@ -89,7 +92,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         etUsername=(EditText)findViewById(R.id.etUsername);
         etPassword=(EditText)findViewById(R.id.etPassword);
-        btnLogin=(Button)findViewById(R.id.btnLogin);
+        btnLogin=(ImageButton)findViewById(R.id.btnLogin);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,6 +106,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().requestProfile().build();
         googleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this,this).addApi(Auth.GOOGLE_SIGN_IN_API,googleSignInOptions).build();
+
+
 
         loginButton = (ImageButton) findViewById(R.id.googlesignin);
         //login.setStyle(SignInButton.SIZE_WIDE, SignInButton.COLOR_DARK);
@@ -291,6 +296,25 @@ private class MyAsyncTask extends AsyncTask<Void, Void, String> {
                                 myDb.insertDeviceData(entry1.getKey().toString(), controllerId, entry1.getValue().toString());
                             }
                         }
+                        /*StaticValues.securityMap=StaticValues.serverResult.get("security");
+                        Iterator iteratorSecurityMap=StaticValues.securityMap.entrySet().iterator();
+                        while(iteratorSecurityMap.hasNext()){
+                            Map.Entry entry= (Map.Entry) iterator.next();
+                            myDb.insertSecurityData(entry.getKey().toString(), entry.getValue().toString());
+                        }
+
+                        StaticValues.topicMap=StaticValues.serverResult.get("topic");
+                        Iterator iteratorTopicMap=StaticValues.topicMap.entrySet().iterator();
+                        while(iteratorTopicMap.hasNext()){
+                            Map.Entry entry= (Map.Entry) iterator.next();
+                            myDb.insertTopicData(entry.getKey().toString(), entry.getValue().toString());
+                        }
+                        /*StaticValues.statusMap=StaticValues.serverResult.get("deviceStatus");
+                        Iterator iteratorStatusMap=StaticValues.statusMap.entrySet().iterator();
+                        while(iteratorStatusMap.hasNext()){
+                            Map.Entry entry= (Map.Entry) iterator.next();
+                            myDb.insertStatusData(entry.getKey().toString(), entry.getValue().toString());
+                        }*/
                         StaticValues.loginUsed=true;
                         myDb.printControllerData(StaticValues.USERNAME);
                         myDb.printDeviceData(StaticValues.USERNAME);

@@ -8,16 +8,30 @@
     android:id="@+id/activity_controller"
     tools:context=".MainActivity" >
 
-    <TextView
-        android:id="@+id/header"
-        android:background="@color/colorBlack"
-        android:textColor="@color/colorWhite"
-        android:layout_weight="1"
-        android:textSize="20dp"
-        android:gravity="center_horizontal"
-        android:paddingTop="30dp"
-        android:layout_width="match_parent"
-        android:layout_height="100dp" />
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="170dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="170dp"
+            android:gravity="center_horizontal"
+            android:layout_weight="1"
+            android:id="@+id/header"
+            android:scaleType="fitXY"
+            android:layout_alignParentBottom = "true"
+            android:src="@drawable/background"
+            android:background="@android:color/transparent"/>
+
+        <ImageButton
+            android:id="@+id/imagebutton1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="fitXY"
+            android:layout_centerInParent="true"
+            android:background="@drawable/bedroomwall"/>
+
+    </RelativeLayout>
 
     <ListView
         android:id="@+id/list"
@@ -27,23 +41,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <ImageButton
-        android:id="@+id/editControllerButton"
-        android:paddingRight="10dp"
-        android:paddingBottom="5dp"
-        android:scaleType="fitEnd"
-        android:layout_above="@+id/addControllerButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorRed" />
 
     <ImageButton
         android:id="@+id/addControllerButton"
+        android:src="@drawable/add"
         android:scaleType="fitEnd"
         android:paddingRight="10dp"
-        android:paddingBottom="10dp"
+        android:paddingBottom="40dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorRed" />
+        android:background="@color/colorWhite" />
 
 </LinearLayout>

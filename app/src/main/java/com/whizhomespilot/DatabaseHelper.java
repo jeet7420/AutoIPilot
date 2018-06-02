@@ -19,6 +19,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String CONTROLLERS_TABLE = "AIC_CONTROLLERS_L";
     public static final String DEVICES_TABLE = "AIC_DEVICES_L";
     public static final String SCHEDULES_TABLE = "AIC_SCHEDULES_L";
+    public static final String STATUS_TABLE = "AIC_STATUS_L";
+    public static final String SECURITY_TABLE = "AIC_SECURITY_L";
+    public static final String TOPIC_TABLE = "AIC_TOPIC_L";
     public static final String CONTROLLERS_TABLE_COL1 = "CONTROLLER_ID";
     public static final String CONTROLLERS_TABLE_COL2 = "CONTROLLER_NAME";
     public static final String DEVICES_COL1 = "DEVICE_ID";
@@ -30,9 +33,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String SCHEDULES_COL4 = "ACTION";
     public static final String SCHEDULES_COL5 = "TIME";
     public static final String SCHEDULES_COL6 = "STATUS";
+    public static final String STATUS_TABLE_COL1 = "DEVICE_ID";
+    public static final String STATUS_TABLE_COL2 = "STATUS";
+    public static final String SECURITY_TABLE_COL1 = "CONTROLLER_ID";
+    public static final String SECURITY_TABLE_COL2 = "SECURTY_TOKEN";
+    public static final String TOPIC_TABLE_COL1 = "CONTROLLER_ID";
+    public static final String TOPIC_TABLE_COL2 = "TOPIC";
     public static String controllerId, controllerName, deviceId, deviceName,
-            action, time, status, schedule_id;
+            action, time, schedule_id, status, securityToken, topic;
     public static HashMap<String,String> controllerMap;
+    public static HashMap<String,String> statusMap;
+    public static HashMap<String,String> securityMap;
+    public static HashMap<String,String> topicMap;
     public static HashMap<String,String> deviceMapForController;
     public static HashMap<String,String> schedularMapForSchedule;
     public static HashMap<String,HashMap<String,String>> deviceMap;
@@ -52,6 +64,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         sqLiteDatabase.execSQL("CREATE TABLE " + SCHEDULES_TABLE + " (" + SCHEDULES_COL1 + " INTEGER PRIMARY KEY AUTOINCREMENT," + SCHEDULES_COL2 + " TEXT,"
                 + SCHEDULES_COL3 + " TEXT," + SCHEDULES_COL4 + " TEXT," + SCHEDULES_COL5 + " TEXT," + SCHEDULES_COL6 + " TEXT)");
+
+        sqLiteDatabase.execSQL("CREATE TABLE " + STATUS_TABLE + " (" + STATUS_TABLE_COL1 + " TEXT," + STATUS_TABLE_COL2 + " TEXT)");
+
+        sqLiteDatabase.execSQL("CREATE TABLE " + SECURITY_TABLE + " (" + SECURITY_TABLE_COL1 + " TEXT," + SECURITY_TABLE_COL2 + " SECURITY_TABLE_COL1)");
+
+        sqLiteDatabase.execSQL("CREATE TABLE " + TOPIC_TABLE + " (" + TOPIC_TABLE_COL1 + " TEXT," + TOPIC_TABLE_COL2 + " TEXT)");
     }
 
     @Override
@@ -98,6 +116,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return true;
     }
 
+    public boolean insertStatusData(String deviceId, String status){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(STATUS_TABLE_COL1, deviceId);
+        contentValues.put(STATUS_TABLE_COL2, status);
+        long result = db.insert(STATUS_TABLE, null, contentValues);
+        if(result == -1)
+            return false;
+        else
+            return true;
+    }
+
+    public boolean insertSecurityData(String controllerId, String securityToken){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(SECURITY_TABLE_COL1, controllerId);
+        contentValues.put(SECURITY_TABLE_COL2, securityToken);
+        long result = db.insert(SECURITY_TABLE, null, contentValues);
+        if(result == -1)
+            return false;
+        else
+            return true;
+    }
+
+    public boolean insertTopicData(String controllerId, String topic){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TOPIC_TABLE_COL1, controllerId);
+        contentValues.put(TOPIC_TABLE_COL2, topic);
+        long result = db.insert(TOPIC_TABLE, null, contentValues);
+        if(result == -1)
+            return false;
+        else
+            return true;
+    }
+
     public boolean updateControllerData(String controllerId, String controllerName){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -129,6 +183,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(SCHEDULES_COL6, status);
         long result = db.update(SCHEDULES_TABLE, contentValues, SCHEDULES_COL2 + "=" + "'" + controllerId + "'"
                 + " and " + SCHEDULES_COL3 + "=" + "'" + deviceId + "'", null);
+        if(result == -1)
+            return false;
+        else
+            return true;
+    }
+
+    public boolean updateStatusData(String deviceId, String status){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(STATUS_TABLE_COL2, status);
+        long result = db.update(STATUS_TABLE, contentValues, STATUS_TABLE_COL1 + "=" +  "'" + deviceId + "'", null);
         if(result == -1)
             return false;
         else
@@ -213,6 +278,54 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return schedulerMap;
     }
 
+    public HashMap<String,String> readStatusData(String username){
+        statusMap=new HashMap<String,String>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] coloumns = {STATUS_TABLE_COL1, STATUS_TABLE_COL2};
+        Cursor c = db.query(STATUS_TABLE, coloumns, null, null, null, null, null);
+        if(c.getCount()>0){
+            c.moveToFirst();
+            do{
+                deviceId = c.getString(0);
+                status = c.getString(1);
+                statusMap.put(deviceId, status);
+            }while(c.moveToNext());
+        }
+        return statusMap;
+    }
+
+    public HashMap<String,String> readSecurityData(String username){
+        securityMap=new HashMap<String,String>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] coloumns = {SECURITY_TABLE_COL1, SECURITY_TABLE_COL2};
+        Cursor c = db.query(SECURITY_TABLE, coloumns, null, null, null, null, null);
+        if(c.getCount()>0){
+            c.moveToFirst();
+            do{
+                controllerId = c.getString(0);
+                securityToken = c.getString(1);
+                securityMap.put(controllerId, securityToken);
+            }while(c.moveToNext());
+        }
+        return securityMap;
+    }
+
+    public HashMap<String,String> readTopicData(String username){
+        topicMap=new HashMap<String,String>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] coloumns = {TOPIC_TABLE_COL1, TOPIC_TABLE_COL2};
+        Cursor c = db.query(TOPIC_TABLE, coloumns, null, null, null, null, null);
+        if(c.getCount()>0){
+            c.moveToFirst();
+            do{
+                controllerId = c.getString(0);
+                topic = c.getString(1);
+                topicMap.put(controllerId, topic);
+            }while(c.moveToNext());
+        }
+        return topicMap;
+    }
+
     public void purgeControllerData(String username){
         SQLiteDatabase db = this.getReadableDatabase();
         db.execSQL("DELETE FROM " + CONTROLLERS_TABLE);
@@ -226,6 +339,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void purgeSchedularData(String username){
         SQLiteDatabase db = this.getReadableDatabase();
         db.execSQL("DELETE FROM " + SCHEDULES_TABLE);
+    }
+
+    public void purgeStatusData(String username){
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL("DELETE FROM " + STATUS_TABLE);
     }
 
     public void printControllerData(String username){
@@ -291,5 +409,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         else
             System.out.println("Schedular Table Empty");
+    }
+
+    public void printStatusData(String username){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] coloumns = {STATUS_TABLE_COL1, STATUS_TABLE_COL2};
+        Cursor c = db.query(STATUS_TABLE, coloumns, null, null, null, null, null);
+        if(c.getCount()>0){
+            c.moveToFirst();
+            System.out.println("STATUS DATA");
+            do{
+                deviceId = c.getString(0);
+                status = c.getString(1);
+                System.out.println("device Id -> " + deviceId);
+                System.out.println("status -> " + status);
+            }while(c.moveToNext());
+        }
+        else
+            System.out.println("Status Table Empty");
     }
 }
