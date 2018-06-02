@@ -217,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
             navItemIndex=position+1;
             System.out.println("position : " + position);
             StaticValues.controllerName=drawerItems.get(navItemIndex-1);
+            StaticValues.isUserNew=false;
             System.out.println("Item Clicked at position : " + navItemIndex + " controller : " + StaticValues.controllerName);
             getSelectedFragment();
         }
@@ -260,6 +261,10 @@ public class MainActivity extends AppCompatActivity {
             EditControllerActivity editControllerActivity = new EditControllerActivity();
             return editControllerActivity;
         }
+        else if(StaticValues.controllerName.equals("User Profile")){
+            UserProfileActivity userProfileActivity = new UserProfileActivity();
+            return userProfileActivity;
+        }
         else if(StaticValues.controllerName.equals("Schedular")){
             SchedularGridActivity schedularActivity = new SchedularGridActivity();
             return schedularActivity;
@@ -276,6 +281,7 @@ public class MainActivity extends AppCompatActivity {
             myDb.purgeDeviceData(StaticValues.USERNAME);
             myDb.purgeSchedularData(StaticValues.USERNAME);
             myDb.purgeStatusData(StaticValues.USERNAME);
+            myDb.purgeUserProfileData(StaticValues.USERNAME);
             return dummyActivity;
         }
         else if(StaticValues.controllerName.equals("About Us")){

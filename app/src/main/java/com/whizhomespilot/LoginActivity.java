@@ -58,7 +58,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     String username, password, response;
     JSONObject jsonResponse, jsonObject;
     public static String mode="C";
-    ImageButton btnLogin;
+    ImageButton btnLogin, btnForgotPassword;
     Context mContext;
     DatabaseHelper myDb;
 
@@ -93,14 +93,31 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         etUsername=(EditText)findViewById(R.id.etUsername);
         etPassword=(EditText)findViewById(R.id.etPassword);
         btnLogin=(ImageButton)findViewById(R.id.btnLogin);
+        btnForgotPassword=(ImageButton)findViewById(R.id.btnForgotPassword);
+
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 username=etUsername.getText().toString();
                 password=etPassword.getText().toString();
+                mode="C";
                 StaticValues.USERNAME=username;
                 new MyAsyncTask().execute();
+            }
+        });
+
+        btnForgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                username=etUsername.getText().toString();
+                if("".equals(username)){
+                    Toast.makeText(getApplicationContext(), "Enter username then click on forgot password", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    mode="FORGOT PASSWORD";
+                    new MyAsyncTask().execute();
+                }
             }
         });
 
@@ -209,6 +226,12 @@ private class MyAsyncTask extends AsyncTask<Void, Void, String> {
             try{
                 StaticValues.serverResult=new HashMap<String, HashMap<String,String>>();
                 HTTPURLConnection httpurlConnection = new HTTPURLConnection();
+                if(mode.equals("FORGOT PASSWORD")){
+                    postDataParams=new HashMap<String, String>();
+                    postDataParams.put("email",username);
+                    jsonResponse = httpurlConnection.invokeService(StaticValues.sendTemporaryPassword, postDataParams);
+                    StaticValues.serverResult=jsonToHashMap(jsonResponse);
+                }
                 if(mode.equals("C")){
                     postDataParams=new HashMap<String, String>();
                     postDataParams.put("email",username);
@@ -216,8 +239,12 @@ private class MyAsyncTask extends AsyncTask<Void, Void, String> {
                     jsonResponse = httpurlConnection.invokeService(StaticValues.loginURL, postDataParams);
                     StaticValues.serverResult=jsonToHashMap(jsonResponse);
                     //StaticValues.deviceStatus=StaticValues.serverResult.get("Devices");
-                    System.out.println("CHECK 2 : " + StaticValues.serverResult.get("homeId"));
-                    System.out.println("CHECK 3 : " + StaticValues.serverResult.get("controllers"));
+                    System.out.println("CHECK 1 : " + StaticValues.serverResult.get("homeId"));
+                    System.out.println("CHECK 2 : " + StaticValues.serverResult.get("controllers"));
+                    System.out.println("CHECK 3 : " + StaticValues.serverResult.get("security"));
+                    System.out.println("CHECK 4 : " + StaticValues.serverResult.get("topic"));
+                    System.out.println("CHECK 5 : " + StaticValues.serverResult.get("deviceStatus"));
+                    System.out.println("CHECK 6 : " + StaticValues.serverResult.get("profile"));
                 }
                 if(mode.equals("G")){
                     postDataParams=new HashMap<String, String>();
@@ -227,8 +254,12 @@ private class MyAsyncTask extends AsyncTask<Void, Void, String> {
                     jsonResponse = httpurlConnection.invokeService(StaticValues.googleSignInURL, postDataParams);
                     StaticValues.serverResult=jsonToHashMap(jsonResponse);
                     //StaticValues.deviceStatus=StaticValues.serverResult.get("Devices");
-                    System.out.println("CHECK 2 : " + StaticValues.serverResult.get("homeId"));
-                    System.out.println("CHECK 3 : " + StaticValues.serverResult.get("controllers"));
+                    System.out.println("CHECK 1 : " + StaticValues.serverResult.get("homeId"));
+                    System.out.println("CHECK 2 : " + StaticValues.serverResult.get("controllers"));
+                    System.out.println("CHECK 3 : " + StaticValues.serverResult.get("security"));
+                    System.out.println("CHECK 4 : " + StaticValues.serverResult.get("topic"));
+                    System.out.println("CHECK 5 : " + StaticValues.serverResult.get("deviceStatus"));
+                    System.out.println("CHECK 6 : " + StaticValues.serverResult.get("profile"));
                 }
                 try{
                     jsonObject=(JSONObject)jsonResponse.get("homeId");
@@ -257,6 +288,12 @@ private class MyAsyncTask extends AsyncTask<Void, Void, String> {
                 else if(result.equals("-999")){
                     Toast.makeText(getApplicationContext(), "INVALID CREDENTIALS", Toast.LENGTH_LONG).show();
                 }
+                else if(result.equals("-777")){
+                    Toast.makeText(getApplicationContext(), "INVALID EMAIL ID", Toast.LENGTH_LONG).show();
+                }
+                else if(result.equals("200")){
+                    Toast.makeText(getApplicationContext(), "NEW PASSWORD SENT TO EMAIL ID", Toast.LENGTH_LONG).show();
+                }
                 /*else if(result.equals("F")){
                     Toast.makeText(getApplicationContext(), "ADMIN LOGIN SUCCESSFULL", Toast.LENGTH_LONG).show();
                     Intent loginAdminIntent=new Intent(LoginActivity.this,MainActivity.class);
@@ -268,6 +305,13 @@ private class MyAsyncTask extends AsyncTask<Void, Void, String> {
                     LoginActivity.this.startActivity(loginUserIntent);
                 }*/
                 else{
+                    StaticValues.userProfileMap=StaticValues.serverResult.get("profile");
+                    Iterator iteratorUserProfileMap=StaticValues.userProfileMap.entrySet().iterator();
+                    while(iteratorUserProfileMap.hasNext()){
+                        Map.Entry entry= (Map.Entry) iteratorUserProfileMap.next();
+                        myDb.insertUserProfileData(entry.getKey().toString(), entry.getValue().toString());
+                    }
+                    myDb.printUserProfileData(StaticValues.USERNAME);
                     //StaticValues.homeMap=StaticValues.serverResult.get("homeId");
                     StaticValues.controllerMap=StaticValues.serverResult.get("controllers");
                     if(StaticValues.controllerMap.size()==0){
@@ -296,28 +340,32 @@ private class MyAsyncTask extends AsyncTask<Void, Void, String> {
                                 myDb.insertDeviceData(entry1.getKey().toString(), controllerId, entry1.getValue().toString());
                             }
                         }
-                        /*StaticValues.securityMap=StaticValues.serverResult.get("security");
+
+                        StaticValues.securityMap=StaticValues.serverResult.get("security");
                         Iterator iteratorSecurityMap=StaticValues.securityMap.entrySet().iterator();
                         while(iteratorSecurityMap.hasNext()){
-                            Map.Entry entry= (Map.Entry) iterator.next();
+                            Map.Entry entry= (Map.Entry) iteratorSecurityMap.next();
                             myDb.insertSecurityData(entry.getKey().toString(), entry.getValue().toString());
                         }
 
                         StaticValues.topicMap=StaticValues.serverResult.get("topic");
                         Iterator iteratorTopicMap=StaticValues.topicMap.entrySet().iterator();
                         while(iteratorTopicMap.hasNext()){
-                            Map.Entry entry= (Map.Entry) iterator.next();
+                            Map.Entry entry= (Map.Entry) iteratorTopicMap.next();
                             myDb.insertTopicData(entry.getKey().toString(), entry.getValue().toString());
                         }
-                        /*StaticValues.statusMap=StaticValues.serverResult.get("deviceStatus");
+
+                        StaticValues.statusMap=StaticValues.serverResult.get("deviceStatus");
                         Iterator iteratorStatusMap=StaticValues.statusMap.entrySet().iterator();
                         while(iteratorStatusMap.hasNext()){
-                            Map.Entry entry= (Map.Entry) iterator.next();
+                            Map.Entry entry= (Map.Entry) iteratorStatusMap.next();
                             myDb.insertStatusData(entry.getKey().toString(), entry.getValue().toString());
-                        }*/
+                        }
+
                         StaticValues.loginUsed=true;
                         myDb.printControllerData(StaticValues.USERNAME);
                         myDb.printDeviceData(StaticValues.USERNAME);
+                        myDb.printUserProfileData(StaticValues.USERNAME);
                         //myDb.printSchedularData(StaticValues.USERNAME);
                     }
                     //StaticValues.deviceMap=StaticValues.serverResult.get("homeId");

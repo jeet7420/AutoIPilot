@@ -1,5 +1,6 @@
 <resources>
     <string-array name="controller_array">
+        <item>User Profile</item>
         <item>Schedular</item>
         <item>Metrics</item>
         <item>About Us</item>

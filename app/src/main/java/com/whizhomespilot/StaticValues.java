@@ -27,6 +27,8 @@ public class StaticValues {
     public static final String getMetricsURL="http://www.autoitechnologies.com/rest/action/getMetrics";
     public static final String googleSignInURL="http://www.autoitechnologies.com/rest/register/googleSingInWH";
     public static final String scheduleDeviceURL="http://www.autoitechnologies.com/rest/controller/scheduleDevice";
+    public static final String changePasswordURL="http://www.autoitechnologies.com/rest/register/changePassword";
+    public static final String sendTemporaryPassword="http://www.autoitechnologies.com/rest/register/sendTemporaryPassword";
     public static final String registerLocalURL="http://localhost:8032/SmHome/rest/register/registerMemberWH";
     public static Context globalRoomContext;
     public static Intent globalRoomIntent;
@@ -47,14 +49,18 @@ public class StaticValues {
     public static final String authServiceDown="AUTHORIZE TOKEN SERVICE DOWN";
     public static final String registerServiceDown="REGISTER SERVICE DOWN";
     public static final String deviceActionServiceDown="DEVICE ACTION SERVICE DOWN";
+    public static final String changePasswordServiceDown="CHANGE PASSWORD SERVICE DOWN";
 
     public static final String loginServiceResponseIssue="LOGIN SERVICE RESPONSE ISSUE";
     public static final String authServiceResponseIssue="AUTHORIZE TOKEN SERVICE RESPONSE ISSUE";
     public static final String registerServiceResponseIssue="REGISTER SERVICE RESPONSE ISSUE";
     public static final String deviceActionResponseIssue="DEVICE ACTION RESPONSE ISSUE";
+    public static final String changePasswordResponseIssue="CHANGE PASSWORD RESPONSE ISSUE";
 
     public static final String ADDNEWCONTROLLER="Add New Controller";
     public static final String EDITCONTROLLER="Edit Controller";
+
+    public static final String MQTT_BROKER_URL="tcp://45.113.138.18:1883";
 
     public static String controller, firstDevice, secondDevice, firstDeviceId, secondDeviceId;
 
@@ -120,6 +126,7 @@ public class StaticValues {
     public static TreeMap<Integer, String> deviceIdMapFull=new TreeMap<Integer, String>();
 
     public static HashMap<String, String> homeMap=new HashMap<String, String>();
+    public static HashMap<String, String> userProfileMap=new HashMap<String, String>();
     public static HashMap<String, String> controllerMap=new HashMap<String, String>();
     public static HashMap<String, HashMap<String,String>> deviceMap=new HashMap<String, HashMap<String,String>>();
     public static HashMap<String, String> deviceMapForSelectedController=new HashMap<String, String>();
@@ -133,6 +140,9 @@ public class StaticValues {
     public static int numberOfSchedules=0;
     public static boolean loginUsed=false;
     public static JSONObject metricsData;
+
+    public static final String UserNameKey="userName";
+    public static final String UserEmailIdKey="email";
 
     public static String roomId="R0";
     public static String deviceId;

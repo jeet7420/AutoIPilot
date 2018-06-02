@@ -16,12 +16,16 @@ import java.util.LinkedHashMap;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "AutoI.db";
+    public static final String USER_PROFILE_TABLE = "AIC_USER_PROFILE_L";
     public static final String CONTROLLERS_TABLE = "AIC_CONTROLLERS_L";
     public static final String DEVICES_TABLE = "AIC_DEVICES_L";
     public static final String SCHEDULES_TABLE = "AIC_SCHEDULES_L";
     public static final String STATUS_TABLE = "AIC_STATUS_L";
     public static final String SECURITY_TABLE = "AIC_SECURITY_L";
     public static final String TOPIC_TABLE = "AIC_TOPIC_L";
+    public static final String USER_PROFILE_TABLE_COL1 = "ID";
+    public static final String USER_PROFILE_TABLE_COL2 = "KEY";
+    public static final String USER_PROFILE_TABLE_COL3 = "VALUE";
     public static final String CONTROLLERS_TABLE_COL1 = "CONTROLLER_ID";
     public static final String CONTROLLERS_TABLE_COL2 = "CONTROLLER_NAME";
     public static final String DEVICES_COL1 = "DEVICE_ID";
@@ -40,7 +44,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TOPIC_TABLE_COL1 = "CONTROLLER_ID";
     public static final String TOPIC_TABLE_COL2 = "TOPIC";
     public static String controllerId, controllerName, deviceId, deviceName,
-            action, time, schedule_id, status, securityToken, topic;
+            action, time, schedule_id, status, securityToken, topic, userProfileKey, userProfileValue,
+            userName, userEmailId;
+    public static HashMap<String,String> userProfileMap;
     public static HashMap<String,String> controllerMap;
     public static HashMap<String,String> statusMap;
     public static HashMap<String,String> securityMap;
@@ -58,6 +64,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        sqLiteDatabase.execSQL("CREATE TABLE " + USER_PROFILE_TABLE + " (" + USER_PROFILE_TABLE_COL1 + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + USER_PROFILE_TABLE_COL2 + " TEXT," + USER_PROFILE_TABLE_COL3 + " TEXT)");
+
         sqLiteDatabase.execSQL("CREATE TABLE " + CONTROLLERS_TABLE + " (" + CONTROLLERS_TABLE_COL1 + " TEXT," + CONTROLLERS_TABLE_COL2 + " TEXT)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + DEVICES_TABLE + " (" + DEVICES_COL1 + " TEXT," + DEVICES_COL2 + " TEXT," + DEVICES_COL3 + " TEXT)");
@@ -74,6 +83,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+    }
+
+    public boolean insertUserProfileData(String key, String value){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(USER_PROFILE_TABLE_COL2, key);
+        contentValues.put(USER_PROFILE_TABLE_COL3, value);
+        long result = db.insert(USER_PROFILE_TABLE, null, contentValues);
+        if(result == -1)
+            return false;
+        else
+            return true;
     }
 
     public boolean insertControllerData(String controllerId, String controllerName){
@@ -210,6 +231,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return true;
     }
 
+    public HashMap<String,String> readUserProfileData(String username){
+        userProfileMap=new HashMap<String,String>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] coloumns = {USER_PROFILE_TABLE_COL2, USER_PROFILE_TABLE_COL3};
+        Cursor c = db.query(USER_PROFILE_TABLE, coloumns, null, null, null, null, null);
+        if(c.getCount()>0){
+            c.moveToFirst();
+            do{
+                userProfileKey = c.getString(0);
+                userProfileValue = c.getString(1);
+                userProfileMap.put(userProfileKey, userProfileValue);
+            }while(c.moveToNext());
+        }
+        return userProfileMap;
+    }
+
     public HashMap<String,String> readControllerData(String username){
         controllerMap=new HashMap<String,String>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -326,6 +363,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return topicMap;
     }
 
+    public void purgeUserProfileData(String username){
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL("DELETE FROM " + USER_PROFILE_TABLE);
+    }
+
     public void purgeControllerData(String username){
         SQLiteDatabase db = this.getReadableDatabase();
         db.execSQL("DELETE FROM " + CONTROLLERS_TABLE);
@@ -344,6 +386,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void purgeStatusData(String username){
         SQLiteDatabase db = this.getReadableDatabase();
         db.execSQL("DELETE FROM " + STATUS_TABLE);
+    }
+
+    public void printUserProfileData(String username){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] coloumns = {USER_PROFILE_TABLE_COL1, USER_PROFILE_TABLE_COL2, USER_PROFILE_TABLE_COL3};
+        Cursor c = db.query(USER_PROFILE_TABLE, coloumns, null, null, null, null, null);
+        if(c.getCount()>0){
+            c.moveToFirst();
+            System.out.println("USER PROFILE DATA");
+            do{
+                userProfileKey = c.getString(1);
+                userProfileValue = c.getString(2);
+                System.out.println(userProfileKey + " -> " + userProfileValue);
+            }while(c.moveToNext());
+        }
+        else
+            System.out.println("User Profile Table Empty");
     }
 
     public void printControllerData(String username){

@@ -43,8 +43,8 @@
 
 
     <ImageButton
-        android:id="@+id/addControllerButton"
-        android:src="@drawable/add"
+        android:id="@+id/editControllerButton"
+        android:src="@drawable/pencil"
         android:scaleType="fitEnd"
         android:paddingRight="10dp"
         android:paddingBottom="40dp"
