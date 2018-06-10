@@ -73,8 +73,6 @@ public class ControllerActivity extends Fragment {
         System.out.println("CONTROLLER NAME : " + controllerName);
         StaticValues.printControllerMap();
         StaticValues.printDeviceMap();
-        StaticValues.printUpdateControllerMap();
-        StaticValues.printUpdateDeviceMap();
         deviceMapForSelectedController=StaticValues.getDeviceMapForSelectedController(controllerId);
         StaticValues.deviceMapForSelectedController=deviceMapForSelectedController;
         numberOfDevices=deviceMapForSelectedController.size();
@@ -125,15 +123,15 @@ public class ControllerActivity extends Fragment {
         }
 
         else if("Hall".equals(StaticValues.controllerName)){
-            roomWall.setBackground(getResources().getDrawable(R.drawable.bedroomwall));
+            roomWall.setBackground(getResources().getDrawable(R.drawable.hallwall));
         }
 
         else if("Kitchen".equals(StaticValues.controllerName)){
-            roomWall.setBackground(getResources().getDrawable(R.drawable.bedroomwall));
+            roomWall.setBackground(getResources().getDrawable(R.drawable.kitchenwall));
         }
 
         else if("Bathroom".equals(StaticValues.controllerName)){
-            roomWall.setBackground(getResources().getDrawable(R.drawable.bedroomwall));
+            roomWall.setBackground(getResources().getDrawable(R.drawable.bathroomwall));
         }
 
         else{
@@ -145,40 +143,22 @@ public class ControllerActivity extends Fragment {
         StaticValues.firstDeviceId=deviceId[0];
         StaticValues.secondDeviceId=deviceId[1];
 
-        roomWall.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                StaticValues.controller=StaticValues.controllerName;
-                StaticValues.controllerName=StaticValues.EDITCONTROLLER;
-                Intent reloadMainActivity = new Intent(ControllerActivity.this.getActivity(),MainActivity.class);
-                ControllerActivity.this.getActivity().startActivity(reloadMainActivity);
-            }
-        });
         System.out.println("CONTROLLER : " + StaticValues.controllerName);
         CustomList adapter = new
                 CustomList(ControllerActivity.this.getActivity(), deviceName, imageId, deviceStatusImage);
         list=(ListView)view.findViewById(R.id.list);
         list.setAdapter(adapter);
-        ImageButton addControllerBtn=(ImageButton)view.findViewById(R.id.addControllerButton);
-        addControllerBtn.setImageResource(R.drawable.add);
-        addControllerBtn.setOnClickListener(new View.OnClickListener() {
+
+        ImageButton editControllerBtn=(ImageButton)view.findViewById(R.id.editControllerButton);
+        editControllerBtn.setImageResource(R.drawable.edit);
+        editControllerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StaticValues.isUserNew=false;
-                StaticValues.controllerName=StaticValues.ADDNEWCONTROLLER;
+                StaticValues.fragmentName=StaticValues.EDITCONTROLLER;
                 Intent reloadMainActivity = new Intent(ControllerActivity.this.getActivity(),MainActivity.class);
                 ControllerActivity.this.getActivity().startActivity(reloadMainActivity);
             }
         });
-        /*ImageButton editControllerBtn=(ImageButton)view.findViewById(R.id.editControllerButton);
-        editControllerBtn.setImageResource(R.drawable.update);
-        editControllerBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                popupAction=editAction;
-                initiatePopupWindow(view);
-            }
-        });*/
         return view;
     }
 }

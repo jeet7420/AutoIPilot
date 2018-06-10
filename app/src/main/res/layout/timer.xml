@@ -68,8 +68,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="10dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="30dp"
         android:orientation="horizontal"
         android:background="@drawable/background"
         android:id="@+id/row3"
@@ -77,13 +77,13 @@
 
         <Button
             android:id="@+id/saveTimer"
-            android:text="SAVE TIMER"
+            android:text="SAVE"
             android:textColor="@color/colorWhite"
             android:layout_below="@+id/etPassword"
             android:gravity="center"
             android:textSize="15dp"
             android:background="@drawable/background"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
     </RelativeLayout>

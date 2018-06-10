@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 
 /**
  * Created by smarhas on 2/25/2018.
@@ -16,6 +17,7 @@ import java.util.LinkedHashMap;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "AutoI.db";
+
     public static final String USER_PROFILE_TABLE = "AIC_USER_PROFILE_L";
     public static final String CONTROLLERS_TABLE = "AIC_CONTROLLERS_L";
     public static final String DEVICES_TABLE = "AIC_DEVICES_L";
@@ -23,29 +25,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String STATUS_TABLE = "AIC_STATUS_L";
     public static final String SECURITY_TABLE = "AIC_SECURITY_L";
     public static final String TOPIC_TABLE = "AIC_TOPIC_L";
+
     public static final String USER_PROFILE_TABLE_COL1 = "ID";
     public static final String USER_PROFILE_TABLE_COL2 = "KEY";
     public static final String USER_PROFILE_TABLE_COL3 = "VALUE";
+
     public static final String CONTROLLERS_TABLE_COL1 = "CONTROLLER_ID";
     public static final String CONTROLLERS_TABLE_COL2 = "CONTROLLER_NAME";
+
     public static final String DEVICES_COL1 = "DEVICE_ID";
     public static final String DEVICES_COL2 = "CONTROLLER_ID";
     public static final String DEVICES_COL3 = "DEVICE_NAME";
+
     public static final String SCHEDULES_COL1 = "SCHEDULE_ID";
     public static final String SCHEDULES_COL2 = "CONTROLLER_ID";
     public static final String SCHEDULES_COL3 = "DEVICE_ID";
     public static final String SCHEDULES_COL4 = "ACTION";
     public static final String SCHEDULES_COL5 = "TIME";
     public static final String SCHEDULES_COL6 = "STATUS";
+
     public static final String STATUS_TABLE_COL1 = "DEVICE_ID";
     public static final String STATUS_TABLE_COL2 = "STATUS";
+
     public static final String SECURITY_TABLE_COL1 = "CONTROLLER_ID";
     public static final String SECURITY_TABLE_COL2 = "SECURTY_TOKEN";
+
     public static final String TOPIC_TABLE_COL1 = "CONTROLLER_ID";
     public static final String TOPIC_TABLE_COL2 = "TOPIC";
+
     public static String controllerId, controllerName, deviceId, deviceName,
-            action, time, schedule_id, status, securityToken, topic, userProfileKey, userProfileValue,
-            userName, userEmailId;
+            action, time, schedule_id, status, securityToken, topic, userProfileKey, userProfileValue;
+
     public static HashMap<String,String> userProfileMap;
     public static HashMap<String,String> controllerMap;
     public static HashMap<String,String> statusMap;
@@ -54,7 +64,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static HashMap<String,String> deviceMapForController;
     public static HashMap<String,String> schedularMapForSchedule;
     public static HashMap<String,HashMap<String,String>> deviceMap;
-    public static LinkedHashMap<Integer,HashMap<String,String>> schedulerMap;
+    public static LinkedHashSet<Schedule> schedulerSet;
+
+    public static Schedule schedule;
+
     public static int numberOfSchedules=0;
 
     public DatabaseHelper(Context context) {
@@ -196,20 +209,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return true;
     }
 
-    public boolean updateScheduleData(String controllerId, String deviceId, String action, String time, String status){
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(SCHEDULES_COL4, action);
-        contentValues.put(SCHEDULES_COL5, time);
-        contentValues.put(SCHEDULES_COL6, status);
-        long result = db.update(SCHEDULES_TABLE, contentValues, SCHEDULES_COL2 + "=" + "'" + controllerId + "'"
-                + " and " + SCHEDULES_COL3 + "=" + "'" + deviceId + "'", null);
-        if(result == -1)
-            return false;
-        else
-            return true;
-    }
-
     public boolean updateStatusData(String deviceId, String status){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -288,31 +287,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return deviceMap;
     }
 
-    public LinkedHashMap<Integer,HashMap<String,String>> readSchedularData(String username){
-        schedulerMap=new LinkedHashMap<Integer,HashMap<String,String>>();
+    public LinkedHashSet<Schedule> readSchedularData(String username){
+        schedulerSet=new LinkedHashSet<Schedule>();
         SQLiteDatabase db = this.getReadableDatabase();
         String[] coloumns = {SCHEDULES_COL1, SCHEDULES_COL2, SCHEDULES_COL3, SCHEDULES_COL4, SCHEDULES_COL5, SCHEDULES_COL6};
         Cursor c = db.query(SCHEDULES_TABLE, coloumns, null, null, null, null, null);
         if(c.getCount()>0){
             c.moveToFirst();
             do{
-                schedularMapForSchedule=new HashMap<String, String>();
+                schedule=new Schedule();
+
                 schedule_id = c.getString(0);
                 controllerId = c.getString(1);
                 deviceId = c.getString(2);
                 action = c.getString(3);
                 time = c.getString(4);
                 status = c.getString(5);
+
                 controllerName=StaticValues.controllerMap.get(controllerId);
                 deviceName=StaticValues.deviceMap.get(controllerId).get(deviceId);
-                schedularMapForSchedule.put("controllerName", controllerName);
-                schedularMapForSchedule.put("deviceName", deviceName);
-                schedularMapForSchedule.put("time", time);
-                schedularMapForSchedule.put("status", action);
-                schedulerMap.put(++numberOfSchedules, schedularMapForSchedule);
+
+                schedule.setAction(action);
+                schedule.setControllerName(controllerName);
+                schedule.setDeviceName(deviceName);
+                schedule.setTime(time);
+
+                schedulerSet.add(schedule);
             }while(c.moveToNext());
         }
-        return schedulerMap;
+        return schedulerSet;
     }
 
     public HashMap<String,String> readStatusData(String username){
@@ -388,6 +391,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM " + STATUS_TABLE);
     }
 
+    public void purgeSecurityData(String username){
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL("DELETE FROM " + SECURITY_TABLE);
+    }
+
+    public void purgeTopicData(String username){
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL("DELETE FROM " + TOPIC_TABLE);
+    }
+
     public void printUserProfileData(String username){
         SQLiteDatabase db = this.getReadableDatabase();
         String[] coloumns = {USER_PROFILE_TABLE_COL1, USER_PROFILE_TABLE_COL2, USER_PROFILE_TABLE_COL3};
@@ -451,7 +464,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             c.moveToFirst();
             System.out.println("SCHEDULAR DATA");
             do{
-                schedularMapForSchedule=new HashMap<String, String>();
                 schedule_id = c.getString(0);
                 controllerId = c.getString(1);
                 deviceId = c.getString(2);
@@ -486,5 +498,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         else
             System.out.println("Status Table Empty");
+    }
+
+    public void printSecurityData(String username){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] coloumns = {SECURITY_TABLE_COL1, SECURITY_TABLE_COL2};
+        Cursor c = db.query(SECURITY_TABLE, coloumns, null, null, null, null, null);
+        if(c.getCount()>0){
+            c.moveToFirst();
+            System.out.println("SECURITY DATA");
+            do{
+                controllerId = c.getString(0);
+                securityToken = c.getString(1);
+                System.out.println("controller Id -> " + controllerId);
+                System.out.println("security token -> " + securityToken);
+            }while(c.moveToNext());
+        }
+        else
+            System.out.println("Security Table Empty");
+    }
+
+    public void printTopicData(String username){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] coloumns = {TOPIC_TABLE_COL1, TOPIC_TABLE_COL2};
+        Cursor c = db.query(TOPIC_TABLE, coloumns, null, null, null, null, null);
+        if(c.getCount()>0){
+            c.moveToFirst();
+            System.out.println("TOPIC DATA");
+            do{
+                controllerId = c.getString(0);
+                topic = c.getString(1);
+                System.out.println("controller Id -> " + controllerId);
+                System.out.println("topic -> " + topic);
+            }while(c.moveToNext());
+        }
+        else
+            System.out.println("Topic Table Empty");
     }
 }

@@ -19,7 +19,6 @@ import java.util.TreeMap;
 
 public class StaticValues {
     public static final String loginURL="http://www.autoitechnologies.com/rest/login/authenticateUserWH";
-    public static final String authURL="http://www.autoitechnologies.com/rest/login/authenticateToken";
     public static final String registerURL="http://www.autoitechnologies.com/rest/register/registerMemberWH";
     public static final String deviceActionURL="http://www.autoitechnologies.com/rest/action/deviceWH";
     public static final String addControllerURL="http://www.autoitechnologies.com/rest/controller/verifyController";
@@ -29,36 +28,37 @@ public class StaticValues {
     public static final String scheduleDeviceURL="http://www.autoitechnologies.com/rest/controller/scheduleDevice";
     public static final String changePasswordURL="http://www.autoitechnologies.com/rest/register/changePassword";
     public static final String sendTemporaryPassword="http://www.autoitechnologies.com/rest/register/sendTemporaryPassword";
-    public static final String registerLocalURL="http://localhost:8032/SmHome/rest/register/registerMemberWH";
-    public static Context globalRoomContext;
-    public static Intent globalRoomIntent;
-    public static boolean connectionStatus=false;
-    public static String controllerName="";
-    public static String fragmentName="";
     public static ArrayList<String> controllerList=new ArrayList<String>();
     public static ArrayList<String> deviceList=new ArrayList<String>();
-    public static final String loginURLLocal="http://192.168.0.107:8057/SmHome/rest/login/authenticateUserWH";
-    //public static final String authURL="http://192.168.0.27:8899/SmHome/rest/login/authenticateToken";
-    //public static final String registerURL="http://192.168.0.27:8899/SmHome/rest/register/user";
-    public static final String deviceActionLocalURL="http://192.168.0.107:8057/SmHome/rest/action/deviceWH";
-    public static final String addControllerLocalURL="http://192.168.0.103:8032/SmHome/rest/controller/verifyController";
-    public static final String editControllerLocalURL="http://192.168.0.108:8032/SmHome/rest/controller/updateController";
-    public static final String scheduleDeviceLocalURL="http://localhost:8035/SmHome/rest/controller/scheduleDevice";
 
     public static final String loginServiceDown="LOGIN SERVICE DOWN";
-    public static final String authServiceDown="AUTHORIZE TOKEN SERVICE DOWN";
     public static final String registerServiceDown="REGISTER SERVICE DOWN";
     public static final String deviceActionServiceDown="DEVICE ACTION SERVICE DOWN";
     public static final String changePasswordServiceDown="CHANGE PASSWORD SERVICE DOWN";
+    public static final String addControllerServiceDown="ADD CONTROLLER SERVICE DOWN";
+    public static final String editControllerServiceDown="EDIT CONTROLLER SERVICE DOWN";
+    public static final String scheduleDeviceServiceDown="SCHEDULE DEVICE SERVICE DOWN";
 
     public static final String loginServiceResponseIssue="LOGIN SERVICE RESPONSE ISSUE";
-    public static final String authServiceResponseIssue="AUTHORIZE TOKEN SERVICE RESPONSE ISSUE";
     public static final String registerServiceResponseIssue="REGISTER SERVICE RESPONSE ISSUE";
     public static final String deviceActionResponseIssue="DEVICE ACTION RESPONSE ISSUE";
     public static final String changePasswordResponseIssue="CHANGE PASSWORD RESPONSE ISSUE";
+    public static final String addControllerServiceResponseDown="ADD CONTROLLER SERVICE RESPONSE ISSUE";
+    public static final String editControllerServiceResponseDown="EDIT CONTROLLER SERVICE RESPONSE ISSUE";
+    public static final String scheduleDeviceServiceResponseDown="SCHEDULE DEVICE SERVICE RESPONSE ISSUE";
 
-    public static final String ADDNEWCONTROLLER="Add New Controller";
+    public static final String MAINACTIVITY="Main Activity";
+    public static final String BLANKACTIVITY="Blank Activity";
+    public static final String ADDNEWCONTROLLER="Add iSwitch";
     public static final String EDITCONTROLLER="Edit Controller";
+    public static final String USERPROFILE="User Profile";
+    public static final String SCHEDULAR="Schedules";
+    public static final String METRICS="Metrics";
+    public static final String ABOUTUS="About Us";
+    public static final String CONTACTUS="Contact Us";
+    public static final String LOGOUT="Logout";
+
+    public static final String CONTROLLER="Controller";
 
     public static final String MQTT_BROKER_URL="tcp://45.113.138.18:1883";
 
@@ -66,66 +66,16 @@ public class StaticValues {
 
     public static String USERNAME="";
     public static final String SOURCEMANUAL="USER";
+
     public static boolean isUserNew=false;
+    public static boolean loginUsed=false;
 
-    public static boolean ISLIGHTON=false;
-    public static int FANSTATUS=0;
-    public static boolean ISWINDOWOPEN=false;
-    public static int ACSTATUS=0;
-
-    public static final String LIGHTOF="0";
-    public static final String LIGHTON="1";
-
-    public static final String FANOF="0";
-    public static final String FAN1="1";
-    public static final String FAN2="2";
-    public static final String FAN3="3";
-    public static final String FAN4="4";
-    public static final String FAN5="5";
-
-    public static final String ACOF="0";
-    public static final String AC1="1";
-    public static final String AC2="2";
-    public static final String AC3="3";
-    public static final String AC4="4";
-    public static final String AC5="5";
-
-    public static final String WINDOWCLOSE="0";
-    public static final String WINDOWOPEN="1";
-
-    public static final String LIGHTOFMESSAGE="0";
-    public static final String LIGHTONMESSAGE="1";
-
-    public static final String FANOFMESSAGE="0";
-    public static final String FAN1MESSAGE="1";
-    public static final String FAN2MESSAGE="2";
-    public static final String FAN3MESSAGE="3";
-    public static final String FAN4MESSAGE="4";
-    public static final String FAN5MESSAGE="5";
-
-    public static final String ACOFMESSAGE="0";
-    public static final String AC1MESSAGE="1";
-    public static final String AC2MESSAGE="2";
-    public static final String AC3MESSAGE="3";
-    public static final String AC4MESSAGE="4";
-    public static final String AC5MESSAGE="5";
-
-    public static final String WINDOWCLOSEMESSAGE="0";
-    public static final String WINDOWOPENMESAGE="1";
-
-    public static final String TYPEISFAN="Fan";
-    public static final String TYPEISLIGHT1="Light 1";
-    public static final String TYPEISLIGHT2="Light 2";
-    public static final String TYPEISLIGHT3="Light1";
-    public static final String TYPEISLIGHT4="Light2";
-    public static final String TYPEISWINDOW="Window";
-    public static final String TYPEISAC="AC";
+    public static String controllerName="";
+    public static String fragmentName="";
+    public static String flowContext="";
 
     public static HashMap<String, HashMap<String,String>> serverResult;
-    public static HashMap<String,String> deviceStatus;
-    public static TreeMap<Integer, String> deviceIdMapFull=new TreeMap<Integer, String>();
 
-    public static HashMap<String, String> homeMap=new HashMap<String, String>();
     public static HashMap<String, String> userProfileMap=new HashMap<String, String>();
     public static HashMap<String, String> controllerMap=new HashMap<String, String>();
     public static HashMap<String, HashMap<String,String>> deviceMap=new HashMap<String, HashMap<String,String>>();
@@ -135,16 +85,12 @@ public class StaticValues {
     public static HashMap<String, String> statusMap=new HashMap<String, String>();
     public static HashMap<String, String> securityMap=new HashMap<String, String>();
     public static HashMap<String, String> topicMap=new HashMap<String, String>();
-    //public static TreeMap<Integer, Schedule> schedularMap=new TreeMap<Integer, Schedule>();
     public static LinkedHashSet<Schedule> schedules=new LinkedHashSet<Schedule>();
-    public static int numberOfSchedules=0;
-    public static boolean loginUsed=false;
     public static JSONObject metricsData;
 
     public static final String UserNameKey="userName";
     public static final String UserEmailIdKey="email";
 
-    public static String roomId="R0";
     public static String deviceId;
     public static String controllerId;
 
@@ -206,19 +152,4 @@ public class StaticValues {
         }
         return null;
     }
-
-    /*public static void removeFromPosition(int position){
-        Iterator schedularIterator=StaticValues.schedularMap.entrySet().iterator();
-        int count=0;
-        int key=-1;
-        while(schedularIterator.hasNext()){
-            Map.Entry entry=(Map.Entry)schedularIterator.next();
-            if(count==position){
-                key= (int) entry.getKey();
-            }
-            count++;
-        }
-        if(key>0)
-            StaticValues.schedularMap.remove(key);
-    }*/
 }

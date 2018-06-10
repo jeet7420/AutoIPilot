@@ -4,11 +4,11 @@ package com.whizhomespilot;
  * Created by smarhas on 5/23/2018.
  */
 
-public class Schedule{
-    String controllerName;
-    String deviceName;
-    String action;
-    String time;
+        public class Schedule{
+            String controllerName;
+            String deviceName;
+            String action;
+            String time;
 
     public String getDeviceName() {
         return deviceName;

@@ -13,13 +13,12 @@ public class TestMQTT {
     MqttClient client;
     public void doDemo(String topic,String status,String deviceId, String securityToken) {
         try {
-            // System.setProperty("http.proxyHost", "www-proxy.idc.oracle.com");
-            //  System.setProperty("http.proxyPort", "80");
-
-            client = new MqttClient("tcp://45.113.138.18:1883", topic,persistence);
+            System.out.println("PAYLOAD : " + securityToken+"-"+deviceId+status);
+            client = new MqttClient("tcp://45.113.138.18:1883", topic, persistence);
             client.connect();
             MqttMessage message = new MqttMessage();
             message.setPayload((securityToken+"-"+deviceId+status).getBytes());
+            System.out.println("PAYLOAD : " + securityToken+"-"+deviceId+status);
             client.publish(topic, message);
             client.disconnect();
             System.out.println("After");

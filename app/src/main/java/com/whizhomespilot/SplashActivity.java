@@ -18,11 +18,7 @@ import android.widget.TextView;
 
 public class SplashActivity extends Activity {
 
-    /** Duration of wait **/
     private final int SPLASH_DISPLAY_LENGTH = 2000;
-    private HorizontalDottedProgress progressBar;
-
-    /** Called when the activity is first created. */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,33 +26,20 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.activity_splash);
 
         Window window = SplashActivity.this.getWindow();
-
-// clear FLAG_TRANSLUCENT_STATUS flag:
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-
-// add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-
-// finally change the color
         window.setStatusBarColor(ContextCompat.getColor(SplashActivity.this,R.color.colorTeal));
-
-        /*getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.transparent)));
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(R.layout.actionbar);
-        TextView title=(TextView)findViewById(getResources().getIdentifier("action_bar_title", "id", getPackageName()));
-        title.setText("");*/
 
         new Handler().postDelayed(new Runnable(){
             @Override
             public void run() {
-                if(SaveSharedPreference.getUserName(SplashActivity.this).length() == 0){
-                    System.out.println("TEST1");
+                if(SaveSharedPreference.getUserName(SplashActivity.this).length()==0){
                     Intent loginIntent=new Intent(SplashActivity.this,LoginActivity.class);
                     SplashActivity.this.startActivity(loginIntent);
-                    System.out.println("TEST2");
                 }
                 else{
-                    Intent mainIntent = new Intent(SplashActivity.this,LoginActivity.class);
+                    StaticValues.loginUsed=Boolean.FALSE;
+                    Intent mainIntent = new Intent(SplashActivity.this,MainActivity.class);
                     SplashActivity.this.startActivity(mainIntent);
                     SplashActivity.this.finish();
                 }

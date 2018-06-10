@@ -63,7 +63,7 @@
     <ImageButton
         android:layout_width="match_parent"
         android:id="@+id/btnRegister"
-        android:src="@drawable/login"
+        android:src="@drawable/register"
         android:layout_marginTop="70dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"

@@ -3,27 +3,39 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="170dp">
+
+    <ImageView
         android:layout_width="match_parent"
-        android:gravity="center"
-        android:textColor="@color/colorTeal"
-        android:layout_gravity="center"
-        android:textSize="30dp"
-        android:textStyle="bold"
-        android:text="WELCOME"
-        android:layout_marginTop="50dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_height="wrap_content" />
+        android:layout_height="170dp"
+        android:gravity="center_horizontal"
+        android:layout_weight="1"
+        android:id="@+id/header"
+        android:scaleType="fitXY"
+        android:layout_alignParentBottom = "true"
+        android:src="@drawable/background"
+        android:background="@android:color/transparent"/>
+
+    <ImageButton
+        android:id="@+id/imagebutton1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="fitXY"
+        android:layout_centerInParent="true"
+        android:background="@drawable/bedroomwall"/>
+
+    </RelativeLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:gravity="center"
         android:id="@+id/userName"
-        android:textColor="@color/colorTeal"
+        android:textColor="@color/colorBlack"
         android:layout_gravity="center"
-        android:textSize="20dp"
-        android:layout_marginTop="40dp"
+        android:textSize="15dp"
+        android:layout_marginTop="60dp"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         android:layout_height="wrap_content" />
@@ -32,9 +44,9 @@
         android:layout_width="match_parent"
         android:gravity="center"
         android:id="@+id/userEmailId"
-        android:textColor="@color/colorTeal"
+        android:textColor="@color/colorBlack"
         android:layout_gravity="center"
-        android:textSize="20dp"
+        android:textSize="15dp"
         android:layout_marginTop="30dp"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
@@ -43,7 +55,7 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:id="@+id/changePassword"
-        android:src="@drawable/viewmetrics"
+        android:src="@drawable/changepassword"
         android:layout_gravity="center"
         android:gravity="center"
         android:background="@color/transparent"

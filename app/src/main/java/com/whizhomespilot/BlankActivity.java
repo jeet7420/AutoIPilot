@@ -26,8 +26,8 @@ public class BlankActivity extends Fragment {
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StaticValues.isUserNew=false;
-                StaticValues.controllerName=StaticValues.ADDNEWCONTROLLER;
+                StaticValues.fragmentName=StaticValues.ADDNEWCONTROLLER;
+                StaticValues.controllerName="";
                 Intent reloadMainActivity = new Intent(BlankActivity.this.getActivity(),MainActivity.class);
                 BlankActivity.this.getActivity().startActivity(reloadMainActivity);
             }

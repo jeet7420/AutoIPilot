@@ -48,8 +48,8 @@
 
     <ImageButton
         android:layout_width="match_parent"
-        android:id="@+id/btnAddController"
-        android:src="@drawable/login"
+        android:id="@+id/btnSave"
+        android:src="@drawable/save"
         android:layout_marginTop="100dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"

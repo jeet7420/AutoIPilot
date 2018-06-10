@@ -1,5 +1,6 @@
 package com.whizhomespilot;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
@@ -40,6 +41,7 @@ public class AddControllerActivity extends Fragment {
     EditText etControllerNumber, etPassKey;
     HashMap<String, String> postDataParams;
     JSONObject jsonResponse, jsonObject;
+    private ProgressDialog pDialog;
     ArrayAdapter<String> adapter;
     DatabaseHelper myDb;
     String response;
@@ -99,7 +101,12 @@ public class AddControllerActivity extends Fragment {
                 newControllerName = actvControllerName.getText().toString();
                 newFirstDeviceName = actvFirstDeviceName.getText().toString();
                 newSecondDeviceName = actvSecondDeviceName.getText().toString();
-                new AddControllerActivity.MyAsyncTask().execute();
+                if("".equals(newControllerNumber) || "".equals(newPassKey) || "".equals(newControllerName)
+                    || "".equals(newFirstDeviceName) || "".equals(newSecondDeviceName)){
+                    Toast.makeText(getActivity(), "Please provide values for all fields", Toast.LENGTH_SHORT).show();
+                }
+                else
+                    new AddControllerActivity.MyAsyncTask().execute();
             }
         });
         return view;
@@ -131,10 +138,10 @@ public class AddControllerActivity extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            //pDialog = new ProgressDialog(RoomActivity.this);
-            //pDialog.setMessage("Please wait...");
-            //pDialog.setCancelable(false);
-            //pDialog.show();
+            pDialog = new ProgressDialog(AddControllerActivity.this.getActivity());
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
         }
 
         @Override
@@ -156,12 +163,12 @@ public class AddControllerActivity extends Fragment {
                 }
                 catch (Exception e){
                     e.printStackTrace();
-                    return StaticValues.deviceActionResponseIssue;
+                    return StaticValues.addControllerServiceResponseDown;
                 }
             }
             catch (Exception e){
                 e.printStackTrace();
-                return StaticValues.deviceActionServiceDown;
+                return StaticValues.addControllerServiceDown;
             }
             return response;
         }
@@ -187,10 +194,36 @@ public class AddControllerActivity extends Fragment {
                     Map.Entry entry=(Map.Entry)iterator.next();
                     myDb.insertDeviceData(entry.getKey().toString(), newControllerNumber, entry.getValue().toString());
                 }
+
+                StaticValues.securityMap.put(newControllerNumber, StaticValues.serverResult.get("broadcastDetails").get("security"));
+                StaticValues.topicMap.put(newControllerNumber, StaticValues.serverResult.get("broadcastDetails").get("topic"));
+
+                Iterator iteratorSecurityMap=StaticValues.securityMap.entrySet().iterator();
+                while(iteratorSecurityMap.hasNext()){
+                    Map.Entry entry= (Map.Entry) iteratorSecurityMap.next();
+                    myDb.insertSecurityData(entry.getKey().toString(), entry.getValue().toString());
+                }
+
+                Iterator iteratorTopicMap=StaticValues.topicMap.entrySet().iterator();
+                while(iteratorTopicMap.hasNext()){
+                    Map.Entry entry= (Map.Entry) iteratorTopicMap.next();
+                    myDb.insertTopicData(entry.getKey().toString(), entry.getValue().toString());
+                }
+
+                StaticValues.statusMap=StaticValues.serverResult.get("deviceStatus");
+                Iterator iteratorStatusMap=StaticValues.statusMap.entrySet().iterator();
+                while(iteratorStatusMap.hasNext()){
+                    Map.Entry entry= (Map.Entry) iteratorStatusMap.next();
+                    myDb.insertStatusData(entry.getKey().toString(), entry.getValue().toString());
+                }
+
                 myDb.printControllerData(StaticValues.USERNAME);
                 myDb.printDeviceData(StaticValues.USERNAME);
                 myDb.printSchedularData(StaticValues.USERNAME);
                 StaticValues.isUserNew = false;
+                StaticValues.controllerName=newControllerName;
+                StaticValues.fragmentName=StaticValues.CONTROLLER;
+                StaticValues.flowContext=StaticValues.ADDNEWCONTROLLER;
                 StaticValues.printControllerMap();
                 StaticValues.printDeviceMap();
                 StaticValues.printUpdateControllerMap();

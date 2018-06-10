@@ -12,7 +12,7 @@
         android:backgroundTint="@color/colorTeal"
         android:textColorHint="@color/colorGreyLight"
         android:textColor="@color/colorBlack"
-        android:hint="Enter Controller Id"
+        android:hint="Enter iSwitch Id"
         android:layout_gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
@@ -48,7 +48,7 @@
         android:textColorHint="@color/colorGreyLight"
         android:textColor="@color/colorBlack"
         android:layout_below="@+id/etControllerNumber"
-        android:hint="Enter Controller Name"
+        android:hint="Enter Room Name"
         android:layout_gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
@@ -98,7 +98,7 @@
     <ImageButton
         android:layout_width="match_parent"
         android:id="@+id/btnAddController"
-        android:src="@drawable/viewmetrics"
+        android:src="@drawable/addiswitch"
         android:layout_marginTop="70dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"

@@ -71,7 +71,6 @@ public class CustomGrid extends BaseAdapter{
         myDb = new DatabaseHelper(mContext);
         if (convertView == null) {
 
-            grid = new View(mContext);
             grid = inflater.inflate(R.layout.grid_single, null);
             TextView textView = (TextView) grid.findViewById(R.id.grid_text);
             ImageButton removeSchedule=(ImageButton)grid.findViewById(R.id.removeSchedule);
@@ -80,7 +79,6 @@ public class CustomGrid extends BaseAdapter{
             removeSchedule.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    System.out.println("fuckoff at : " + position);
                     Schedule schedule=StaticValues.getScheduleAtPosition(position);
                     if(schedule!=null){
                         controllerName=schedule.getControllerName();
@@ -94,11 +92,13 @@ public class CustomGrid extends BaseAdapter{
                         startDate="-1";
                         endDate="-1";
                         schedularDeviceStatus="-1";
-                        new CustomGrid.MyAsyncTask().execute();
-                        //StaticValues.removeFromPosition(position);
-                        //StaticValues.schedularMap.remove(position+1);
+                        System.out.println("AAAA : " + controllerName);
                         StaticValues.schedules.remove(schedule);
-                        StaticValues.controllerName="Schedular";
+                        StaticValues.fragmentName=StaticValues.SCHEDULAR;
+                        StaticValues.controllerName="";
+                        StaticValues.flowContext=StaticValues.SCHEDULAR;
+                        myDb.deleteScheduleData(controllerId, deviceId);
+                        new CustomGrid.MyAsyncTask().execute();
                         Intent reloadMainActivity = new Intent(mContext,MainActivity.class);
                         mContext.startActivity(reloadMainActivity);
                     }
@@ -151,22 +151,10 @@ public class CustomGrid extends BaseAdapter{
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            //Toast.makeText(CustomList.this.getActivity(), result, Toast.LENGTH_LONG).show();
             System.out.println(result);
-            /*if(deviceActionMode.equals("U")){
-                myDb.updateScheduleData(controllerId, deviceId, schedularDeviceStatus, startTime, "OPEN");
-                myDb.printControllerData(StaticValues.USERNAME);
-                myDb.printDeviceData(StaticValues.USERNAME);
-                myDb.printSchedularData(StaticValues.USERNAME);
-            }
-            if(deviceActionMode.equals("D")){
-                myDb.deleteScheduleData(controllerId, deviceId);
-                myDb.printControllerData(StaticValues.USERNAME);
-                myDb.printDeviceData(StaticValues.USERNAME);
-                myDb.printSchedularData(StaticValues.USERNAME);
-            }*/
-            //if (pDialog.isShowing())
-            //  pDialog.dismiss();
+            myDb.printControllerData(StaticValues.USERNAME);
+            myDb.printDeviceData(StaticValues.USERNAME);
+            myDb.printSchedularData(StaticValues.USERNAME);
         }
     }
 }

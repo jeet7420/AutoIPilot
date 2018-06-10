@@ -22,6 +22,8 @@ import android.widget.Toast;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by smarhas on 12/16/2017.
@@ -35,6 +37,7 @@ public class RegisterActivity extends AppCompatActivity {
     JSONObject jsonResponse;
     ImageButton btnRegister;
     public static final String mode="C";
+    DatabaseHelper myDb;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,25 +46,13 @@ public class RegisterActivity extends AppCompatActivity {
 
         Window window = RegisterActivity.this.getWindow();
 
-// clear FLAG_TRANSLUCENT_STATUS flag:
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
-// add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
-// finally change the color
         window.setStatusBarColor(ContextCompat.getColor(RegisterActivity.this,R.color.colorTeal));
 
-        /*getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorBlack)));
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(R.layout.actionbar);
-        TextView title=(TextView)findViewById(getResources().getIdentifier("action_bar_title", "id", getPackageName()));
-        title.setText("WHIZ HOMES");
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);*/
-
-        Intent accessTokenIntent=getIntent();
-        homeId=accessTokenIntent.getStringExtra("homeId");
+        myDb = new DatabaseHelper(this);
 
         etName=(EditText)findViewById(R.id.etName);
         etPassword=(EditText)findViewById(R.id.etPassword);
@@ -78,7 +69,12 @@ public class RegisterActivity extends AppCompatActivity {
                 email=etEmail.getText().toString();
                 phone=etPhone.getText().toString();
 
-                new RegisterActivity.MyAsyncTask().execute();
+                if("".equals(name) || "".equals(password) || "".equals(email) || "".equals(phone)){
+                    Toast.makeText(getApplicationContext(), "Please provide values for all fields", Toast.LENGTH_SHORT).show();
+                }
+
+                else
+                    new RegisterActivity.MyAsyncTask().execute();
             }
         });
     }
@@ -108,6 +104,8 @@ public class RegisterActivity extends AppCompatActivity {
                 jsonResponse = httpurlConnection.invokeService(StaticValues.registerURL, postDataParams);
                 try{
                     response=jsonResponse.get("key").toString();
+                    name=jsonResponse.get("userName").toString();
+                    email=jsonResponse.get("email").toString();
                 }
                 catch (Exception e){
                     e.printStackTrace();
@@ -133,7 +131,16 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "USER ALREADY REGISTERED", Toast.LENGTH_LONG).show();
                 }
                 else if(result.equals("1")){
+                    StaticValues.userProfileMap.put(StaticValues.UserNameKey,name);
+                    StaticValues.userProfileMap.put(StaticValues.UserEmailIdKey,email);
+                    Iterator iteratorUserProfileMap=StaticValues.userProfileMap.entrySet().iterator();
+                    while(iteratorUserProfileMap.hasNext()){
+                        Map.Entry entry= (Map.Entry) iteratorUserProfileMap.next();
+                        myDb.insertUserProfileData(entry.getKey().toString(), entry.getValue().toString());
+                    }
+                    myDb.printUserProfileData(StaticValues.USERNAME);
                     StaticValues.isUserNew=true;
+                    StaticValues.fragmentName="";
                     Intent registerIntent=new Intent(RegisterActivity.this,MainActivity.class);
                     RegisterActivity.this.startActivity(registerIntent);
                     Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();

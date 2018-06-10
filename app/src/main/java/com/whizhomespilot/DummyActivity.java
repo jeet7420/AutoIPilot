@@ -24,7 +24,6 @@ public class DummyActivity extends Fragment {
         View view=inflater.inflate(R.layout.activity_blank, container, false);
         Intent loginIntent=new Intent(DummyActivity.this.getActivity(),LoginActivity.class);
         DummyActivity.this.startActivity(loginIntent);
-        // Inflate the layout for this fragment
         return view;
     }
 }

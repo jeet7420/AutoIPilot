@@ -1,5 +1,6 @@
 package com.whizhomespilot;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -28,10 +29,10 @@ import java.util.Map;
 public class EditControllerActivity extends Fragment {
     String newControllerName, newFirstDeviceName, newSecondDeviceName;
     AutoCompleteTextView actvControllerName, actvFirstDeviceName, actvSecondDeviceName;
-    private String[] mControllerNames, mDeviceNames;
-    public static final String CUSTOM="Custom";
     HashMap<String, HashMap<String,String>> postDataParams;
+    private String[] mControllerNames, mDeviceNames;
     JSONObject jsonResponse, jsonObject;
+    private ProgressDialog pDialog;
     ArrayAdapter<String> adapter;
     DatabaseHelper myDb;
     String response;
@@ -50,7 +51,7 @@ public class EditControllerActivity extends Fragment {
         actvFirstDeviceName = (AutoCompleteTextView) view.findViewById(R.id.actvFirstDeviceName);
         actvSecondDeviceName = (AutoCompleteTextView) view.findViewById(R.id.actvSecondDeviceName);
 
-        actvControllerName.setText(StaticValues.controller);
+        actvControllerName.setText(StaticValues.controllerName);
         actvFirstDeviceName.setText(StaticValues.firstDevice);
         actvSecondDeviceName.setText(StaticValues.secondDevice);
 
@@ -83,18 +84,23 @@ public class EditControllerActivity extends Fragment {
             }
         });
 
-        ImageButton btnAddController = (ImageButton) view.findViewById(R.id.btnAddController);
-        btnAddController.setOnClickListener(new View.OnClickListener() {
+        ImageButton btnSave = (ImageButton) view.findViewById(R.id.btnSave);
+        btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 newControllerName = actvControllerName.getText().toString();
                 newFirstDeviceName = actvFirstDeviceName.getText().toString();
                 newSecondDeviceName = actvSecondDeviceName.getText().toString();
-                StaticValues.controller=newControllerName;
-                StaticValues.updateControllerMap.put(StaticValues.controllerId, newControllerName);
-                StaticValues.updateDeviceMap.put(StaticValues.firstDeviceId, newFirstDeviceName);
-                StaticValues.updateDeviceMap.put(StaticValues.secondDeviceId, newSecondDeviceName);
-                new EditControllerActivity.MyAsyncTask().execute();
+                if("".equals(newControllerName) || "".equals(newFirstDeviceName) || "".equals(newSecondDeviceName)){
+                    Toast.makeText(getActivity(), "Please provide values for all fields", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    StaticValues.controllerName=newControllerName;
+                    StaticValues.updateControllerMap.put(StaticValues.controllerId, newControllerName);
+                    StaticValues.updateDeviceMap.put(StaticValues.firstDeviceId, newFirstDeviceName);
+                    StaticValues.updateDeviceMap.put(StaticValues.secondDeviceId, newSecondDeviceName);
+                    new EditControllerActivity.MyAsyncTask().execute();
+                }
             }
         });
         return view;
@@ -127,10 +133,10 @@ public class EditControllerActivity extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            //pDialog = new ProgressDialog(RoomActivity.this);
-            //pDialog.setMessage("Please wait...");
-            //pDialog.setCancelable(false);
-            //pDialog.show();
+            pDialog = new ProgressDialog(EditControllerActivity.this.getActivity());
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
         }
 
         @Override
@@ -148,12 +154,12 @@ public class EditControllerActivity extends Fragment {
                 }
                 catch (Exception e){
                     e.printStackTrace();
-                    return StaticValues.deviceActionResponseIssue;
+                    return StaticValues.editControllerServiceResponseDown;
                 }
             }
             catch (Exception e){
                 e.printStackTrace();
-                return StaticValues.deviceActionServiceDown;
+                return StaticValues.editControllerServiceDown;
             }
             return response;
         }
@@ -172,17 +178,19 @@ public class EditControllerActivity extends Fragment {
                 myDb.updateControllerData(StaticValues.controllerId, newControllerName);
                 StaticValues.deviceMap.put(StaticValues.controllerId, StaticValues.updateDeviceMap);
                 Iterator iterator=StaticValues.updateDeviceMap.entrySet().iterator();
+                StaticValues.controllerName=newControllerName;
+                StaticValues.fragmentName=StaticValues.CONTROLLER;
+                StaticValues.flowContext=StaticValues.EDITCONTROLLER;
                 while(iterator.hasNext()){
                     Map.Entry entry=(Map.Entry)iterator.next();
-                    myDb.insertDeviceData(entry.getKey().toString(), StaticValues.controllerId, entry.getValue().toString());
+                    myDb.updateDeviceData(entry.getKey().toString(), StaticValues.controllerId, entry.getValue().toString());
                 }
             } else
                 Toast.makeText(EditControllerActivity.this.getActivity(), "Controller could not be updated. Please try again !", Toast.LENGTH_LONG).show();
             Intent reloadMainActivity = new Intent(EditControllerActivity.this.getActivity(),MainActivity.class);
-            StaticValues.controllerName=StaticValues.controller;
             EditControllerActivity.this.getActivity().startActivity(reloadMainActivity);
-        //if (pDialog.isShowing())
-        //  pDialog.dismiss();
+            if (pDialog.isShowing())
+                pDialog.dismiss();
         }
     }
 }

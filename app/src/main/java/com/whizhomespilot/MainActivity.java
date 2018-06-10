@@ -1,10 +1,19 @@
 package com.whizhomespilot;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +26,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,12 +36,20 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -44,45 +62,58 @@ public class MainActivity extends AppCompatActivity {
     private String[] mControllerTitles;
     public static int navItemIndex = 0;
     private CharSequence mDrawerTitle;
+    public String selectedDrawerItem;
     private ListView mDrawerList;
+    private Context context;
+    HashMap<String, String> postDataParams;
+    private ProgressDialog pDialog;
+    JSONObject jsonResponse;
+    private PopupWindow popupWindow;
+    String newPassword, confirmPassword, username, email, response;
+    EditText etNewPassword, etConfirmPassword;
+    Button savePopupDetails;
+    private LayoutInflater layoutInflator;
     private CharSequence mTitle;
     private Handler mHandler;
+    ImageButton editProfile;
+    TextView name;
+    int pos=0;
     DatabaseHelper myDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        System.out.println("TEST3");
         setContentView(R.layout.activity_main);
 
-        System.out.println("Inside Main Activity");
         Window window = MainActivity.this.getWindow();
-
-        // clear FLAG_TRANSLUCENT_STATUS flag:
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-
-        // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-
-        // finally change the color
         window.setStatusBarColor(ContextCompat.getColor(MainActivity.this,R.color.colorTheme));
-        myDb = new DatabaseHelper(this);
+
+        context=this;
+        myDb = new DatabaseHelper(context);
+
         if(!StaticValues.loginUsed){
             StaticValues.USERNAME=SaveSharedPreference.getUserName(MainActivity.this);
+            StaticValues.userProfileMap=myDb.readUserProfileData(StaticValues.USERNAME);
             StaticValues.controllerMap=myDb.readControllerData(StaticValues.USERNAME);
             StaticValues.deviceMap=myDb.readDeviceData(StaticValues.USERNAME);
-            //StaticValues.schedularMap=myDb.readSchedularData(StaticValues.USERNAME);
+            StaticValues.schedules=myDb.readSchedularData(StaticValues.USERNAME);
             StaticValues.statusMap=myDb.readStatusData(StaticValues.USERNAME);
             StaticValues.securityMap=myDb.readSecurityData(StaticValues.USERNAME);
             StaticValues.topicMap=myDb.readTopicData(StaticValues.USERNAME);
         }
+
+        myDb.printUserProfileData(StaticValues.USERNAME);
         myDb.printControllerData(StaticValues.USERNAME);
         myDb.printDeviceData(StaticValues.USERNAME);
+        myDb.printSchedularData(StaticValues.USERNAME);
         myDb.printStatusData(StaticValues.USERNAME);
-        //myDb.printSchedularData(StaticValues.USERNAME);
+        myDb.printSecurityData(StaticValues.USERNAME);
+        myDb.printTopicData(StaticValues.USERNAME);
+
         drawerItems.clear();
         StaticValues.controllerList.clear();
-        StaticValues.controllerList.add(StaticValues.ADDNEWCONTROLLER);
         mHandler = new Handler();
         mTitle = mDrawerTitle = getTitle();
         mControllerTitles = getResources().getStringArray(R.array.controller_array);
@@ -90,9 +121,50 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
-        // set a custom shadow that overlays the main content when the drawer opens
+        LayoutInflater myinflater = getLayoutInflater();
+        ViewGroup myHeader = (ViewGroup)myinflater.inflate(R.layout.drawer_header, mDrawerList, false);
+        mDrawerList.addHeaderView(myHeader, null, false);
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.avatar);
+
+        RoundedBitmapDrawable rounded =   RoundedBitmapDrawableFactory.create(getResources(), bitmap);
+
+        rounded.setCornerRadius(bitmap.getWidth());
+
+        ImageView drawerProfile = (ImageView) mDrawerList.findViewById(R.id.drawer_profile_image);
+        drawerProfile.setImageDrawable(rounded);
+
+        editProfile=(ImageButton)mDrawerList.findViewById(R.id.editProfile);
+
+        name=(TextView)mDrawerList.findViewById(R.id.name);
+
+        StaticValues.userProfileMap=myDb.readUserProfileData(StaticValues.USERNAME);
+
+        username=StaticValues.userProfileMap.get(StaticValues.UserNameKey);
+        email=StaticValues.userProfileMap.get(StaticValues.UserEmailIdKey);
+
+        System.out.println("NAME : " + username);
+
+        name.setText(username.substring(0, username.indexOf(' ')));
+
+        editProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(StaticValues.controllerList.size()>0){
+                    StaticValues.controllerName=StaticValues.controllerList.get(0);
+                    StaticValues.fragmentName=StaticValues.CONTROLLER;
+                }
+                else{
+                    StaticValues.controllerName="";
+                    StaticValues.fragmentName="";
+                }
+                getControllerFragment();
+                mDrawerLayout.closeDrawer(mDrawerList);
+                initiatePopupWindow(view);
+            }
+        });
+
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        // set up the drawer's list view with items and click listener
         if(StaticValues.controllerMap.size()!=0) {
             Iterator iteratorControllerMap = StaticValues.controllerMap.entrySet().iterator();
             while (iteratorControllerMap.hasNext()) {
@@ -101,9 +173,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         System.out.println("Controller ArrayList : " + StaticValues.controllerList);
-        /*StaticValues.controllerList.add("Master Bedroom");
-        StaticValues.controllerList.add("Child Bedroom");
-        StaticValues.controllerList.add("Hall Room");*/
+
+        drawerItems.add(StaticValues.ADDNEWCONTROLLER);
         drawerItems.addAll(StaticValues.controllerList);
         drawerItems.addAll(drawerStaticItems);
 
@@ -113,10 +184,7 @@ public class MainActivity extends AppCompatActivity {
                 R.layout.drawer_list_item, drawerItems));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
-        // enable ActionBar app icon to behave as action to toggle nav drawer
-        //getSupportActionBar().setLogo(R.drawable.smb);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.sidemenubutton);
-        //getSupportActionBar().setTitle(R.string.main_activity_title);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorTheme)));
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.actionbar);
@@ -127,8 +195,6 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        // ActionBarDrawerToggle ties together the the proper interactions
-        // between the sliding drawer and the action bar app icon
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
                 mDrawerLayout,         /* DrawerLayout object */
@@ -155,13 +221,13 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             if(StaticValues.isUserNew){
                 navItemIndex = -1;
-                StaticValues.controllerName="NO CONTROLLER";
+                StaticValues.controllerName="";
                 getSelectedFragment();
             }
             else{
-                if("".equals(StaticValues.controllerName) || "Logout".equals(StaticValues.controllerName)){
-                    navItemIndex = 1;
-                    StaticValues.controllerName=drawerItems.get(navItemIndex);
+                if("".equals(StaticValues.controllerName)){
+                    navItemIndex = 2;
+                    StaticValues.controllerName=drawerItems.get(navItemIndex-1);
                 }
                 getSelectedFragment();
             }
@@ -196,7 +262,9 @@ public class MainActivity extends AppCompatActivity {
         switch(item.getItemId()) {
             case R.id.action_websearch:
                 // create intent to perform web search for this planet
-                Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+                Uri uri = Uri.parse("http://autoiinnovations.com/");
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(intent);
                 intent.putExtra(SearchManager.QUERY, getSupportActionBar().getTitle());
                 // catch event that there's no activity to handle intent
                 if (intent.resolveActivity(getPackageManager()) != null) {
@@ -214,10 +282,26 @@ public class MainActivity extends AppCompatActivity {
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            navItemIndex=position+1;
-            System.out.println("position : " + position);
-            StaticValues.controllerName=drawerItems.get(navItemIndex-1);
-            StaticValues.isUserNew=false;
+            pos=position-1;
+            navItemIndex=pos+1;
+            System.out.println("position : " + pos);
+            selectedDrawerItem=drawerItems.get(navItemIndex-1);
+            if(selectedDrawerItem.equals(StaticValues.ADDNEWCONTROLLER) ||
+               selectedDrawerItem.equals(StaticValues.EDITCONTROLLER) ||
+               selectedDrawerItem.equals(StaticValues.USERPROFILE) ||
+               selectedDrawerItem.equals(StaticValues.SCHEDULAR) ||
+               selectedDrawerItem.equals(StaticValues.METRICS) ||
+               selectedDrawerItem.equals(StaticValues.ABOUTUS) ||
+               selectedDrawerItem.equals(StaticValues.CONTACTUS) ||
+               selectedDrawerItem.equals(StaticValues.LOGOUT)){
+                StaticValues.fragmentName=drawerItems.get(navItemIndex-1);
+                StaticValues.controllerName="";
+            }
+            else{
+                StaticValues.isUserNew=false;
+                StaticValues.fragmentName=StaticValues.CONTROLLER;
+                StaticValues.controllerName=drawerItems.get(navItemIndex-1);
+            }
             System.out.println("Item Clicked at position : " + navItemIndex + " controller : " + StaticValues.controllerName);
             getSelectedFragment();
         }
@@ -249,48 +333,61 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private android.support.v4.app.Fragment getControllerFragment() {
-        if(StaticValues.isUserNew){
+        if(StaticValues.flowContext.equals(StaticValues.ADDNEWCONTROLLER) ||
+                StaticValues.flowContext.equals(StaticValues.EDITCONTROLLER)){
+            mDrawerList.setItemChecked(drawerItems.indexOf(StaticValues.controllerName), true);
+            StaticValues.flowContext="";
+        }
+        if(StaticValues.flowContext.equals(StaticValues.SCHEDULAR)){
+            mDrawerList.setItemChecked(drawerItems.indexOf(StaticValues.SCHEDULAR), true);
+            StaticValues.flowContext="";
+        }
+        if(StaticValues.isUserNew && "".equals(StaticValues.fragmentName)){
             BlankActivity blankActivity=new BlankActivity();
             return blankActivity;
         }
-        else if(StaticValues.controllerName.equals(StaticValues.ADDNEWCONTROLLER)){
+        else if(StaticValues.fragmentName.equals(StaticValues.ADDNEWCONTROLLER)){
             AddControllerActivity addControllerActivity = new AddControllerActivity();
             return addControllerActivity;
         }
-        else if(StaticValues.controllerName.equals(StaticValues.EDITCONTROLLER)){
+        else if(StaticValues.fragmentName.equals(StaticValues.EDITCONTROLLER)){
             EditControllerActivity editControllerActivity = new EditControllerActivity();
             return editControllerActivity;
         }
-        else if(StaticValues.controllerName.equals("User Profile")){
+        else if(StaticValues.fragmentName.equals(StaticValues.USERPROFILE)){
             UserProfileActivity userProfileActivity = new UserProfileActivity();
             return userProfileActivity;
         }
-        else if(StaticValues.controllerName.equals("Schedular")){
+        else if(StaticValues.fragmentName.equals(StaticValues.SCHEDULAR)){
             SchedularGridActivity schedularActivity = new SchedularGridActivity();
             return schedularActivity;
         }
-        else if(StaticValues.controllerName.equals("Metrics")){
+        else if(StaticValues.fragmentName.equals(StaticValues.METRICS)){
             MetricsDetailsActivity metricsDetailsActivity = new MetricsDetailsActivity();
             return metricsDetailsActivity;
         }
-        else if(StaticValues.controllerName.equals("Logout")){
+        else if(StaticValues.fragmentName.equals(StaticValues.ABOUTUS)){
+            AboutUsActivity aboutUsActivity = new AboutUsActivity();
+            return aboutUsActivity;
+        }
+        else if(StaticValues.fragmentName.equals(StaticValues.CONTACTUS)){
+            ContactUsActivity contactUsActivity = new ContactUsActivity();
+            return contactUsActivity;
+        }
+        else if(StaticValues.fragmentName.equals(StaticValues.LOGOUT)){
             DummyActivity dummyActivity = new DummyActivity();
-            //BlankActivity blankActivity=new BlankActivity();
             SaveSharedPreference.clearUserName(MainActivity.this);
+            myDb.purgeUserProfileData(StaticValues.USERNAME);
             myDb.purgeControllerData(StaticValues.USERNAME);
             myDb.purgeDeviceData(StaticValues.USERNAME);
             myDb.purgeSchedularData(StaticValues.USERNAME);
             myDb.purgeStatusData(StaticValues.USERNAME);
-            myDb.purgeUserProfileData(StaticValues.USERNAME);
+            myDb.purgeSecurityData(StaticValues.USERNAME);
+            myDb.purgeTopicData(StaticValues.USERNAME);
+            StaticValues.fragmentName="";
+            StaticValues.controllerName="";
+            StaticValues.flowContext="";
             return dummyActivity;
-        }
-        else if(StaticValues.controllerName.equals("About Us")){
-            AboutUsActivity aboutUsActivity = new AboutUsActivity();
-            return aboutUsActivity;
-        }
-        else if(StaticValues.controllerName.equals("Contact Us")){
-            ContactUsActivity contactUsActivity = new ContactUsActivity();
-            return contactUsActivity;
         }
         else {
             ControllerActivity controllerActivity = new ControllerActivity();
@@ -321,5 +418,98 @@ public class MainActivity extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggls
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    private void initiatePopupWindow(final View v) {
+        try {
+            layoutInflator = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            final View layout = layoutInflator.inflate(R.layout.change_password,
+                    (ViewGroup) v.findViewById(R.id.popup_change_password));
+            popupWindow = new PopupWindow(layout, 1000, 700, true);
+            popupWindow.showAtLocation(layout, Gravity.CENTER, 0, 150);
+            popupWindow.setFocusable(true);
+            Toolbar toolbar = (Toolbar) layout.findViewById(R.id.mytoolbar);
+            TextView textView = (TextView) toolbar.findViewById(R.id.tv_toolbar);
+            ImageButton closePopup = (ImageButton) toolbar.findViewById(R.id.close_popup);
+            textView.setText("CHANGE PASSWORD");
+            textView.setTextColor(Color.BLACK);
+            closePopup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    v.setSelected(false);
+                    popupWindow.dismiss();
+                }
+            });
+            etNewPassword=(EditText)layout.findViewById(R.id.etNewPassword);
+            etConfirmPassword=(EditText)layout.findViewById(R.id.etConfirmPassword);
+            savePopupDetails=(Button) layout.findViewById(R.id.saveTimer);
+            savePopupDetails.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    newPassword=etNewPassword.getText().toString();
+                    confirmPassword=etConfirmPassword.getText().toString();
+                    if("".equals(newPassword) || "".equals(confirmPassword)){
+                        System.out.println("123");
+                        Toast.makeText(getApplicationContext(), "Please enter all values", Toast.LENGTH_SHORT).show();
+                    }
+                    else if(!(newPassword.equals(confirmPassword))){
+                        System.out.println("890");
+                        Toast.makeText(getApplicationContext(), "Password and confirm password should be same", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                        new MyAsyncTask().execute();
+                }
+            });
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class MyAsyncTask extends AsyncTask<Void, Void, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            pDialog = new ProgressDialog(context);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+        @Override
+        protected String doInBackground(Void... arg0) {
+            try {
+                HTTPURLConnection httpurlConnection = new HTTPURLConnection();
+                postDataParams = new HashMap<String, String>();
+                postDataParams.put("email", email);
+                postDataParams.put("password", newPassword);
+                jsonResponse = httpurlConnection.invokeService(StaticValues.changePasswordURL, postDataParams);
+                try {
+                    response = jsonResponse.get("response").toString();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return StaticValues.changePasswordServiceDown;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return StaticValues.changePasswordResponseIssue;
+            }
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            System.out.println(result);
+            if(result.equals("-1")){
+                Toast.makeText(context, "INTERNAL ERROR. PLEASE TRY AGAIN", Toast.LENGTH_LONG).show();
+            }
+            if(result.equals("1")){
+                Toast.makeText(context, "PASSWORD CHANGED SUCCESSFULLY", Toast.LENGTH_LONG).show();
+            }
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+            popupWindow.dismiss();
+        }
     }
 }

@@ -47,15 +47,16 @@ public class CustomList extends ArrayAdapter<String> {
     private RelativeLayout layout;
     private final Activity context;
     private final String[] deviceName;
+    private final String[] deviceIdArray=new String[2];
     private final Integer[] imageId;
     private final Integer[] buttonId;
-    private boolean isFanOn=false;
-    private boolean isLightOn=false;
+    private boolean isFanOn=true;
+    private boolean isLightOn=true;
     private boolean isSchedulerDeviceOn=true;
-    private String deviceId, name, controllerId, signal, response, controllerName, topic, securtiyToken;
+    private String deviceId, name, controllerId, signal,
+            response, controllerName, topic, securtiyToken;
     HashMap<String, String> postDataParams;
-    HashMap<String, String> schedularDetails;
-    JSONObject jsonResponse, jsonObject;
+    JSONObject jsonResponse;
     private ProgressDialog pDialog;
     public String deviceActionMode="U";
     public String schedularDeviceStatus="1";
@@ -69,7 +70,6 @@ public class CustomList extends ArrayAdapter<String> {
     DatabaseHelper myDb;
     SimpleDateFormat sdf;
     Button btnSaveTimer;
-    //Context context;
     int status=0;
     public CustomList(Activity context,
                       String[] deviceName, Integer[] imageId, Integer[] buttonId) {
@@ -91,20 +91,30 @@ public class CustomList extends ArrayAdapter<String> {
         txtTitle.setText(deviceName[position]);
         imageView.setImageResource(imageId[position]);
         imageButton.setImageResource(buttonId[position]);
+        deviceIdArray[position]=StaticValues.getDeviceId(deviceName[position], StaticValues.deviceMapForSelectedController);
+        if(position==0){
+            if("0".equals(StaticValues.statusMap.get(deviceIdArray[position])))
+                isFanOn=false;
+            else
+                isFanOn=true;
+        }
+        else{
+            if("0".equals(StaticValues.statusMap.get(deviceIdArray[position])))
+                isLightOn=false;
+            else
+                isLightOn=true;
+        }
 
         rowView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
                 view.setSelected(true);
                 schedule=new Schedule();
-                //schedularDetails=new HashMap<String, String>();
                 TextView txtTitle = (TextView) view.findViewById(R.id.txt);
                 System.out.println("LONG CLICK ITEM -> " + txtTitle.getText().toString());
                 controllerId=StaticValues.controllerId;
                 controllerName=StaticValues.controllerName;
                 deviceId=StaticValues.getDeviceId(txtTitle.getText().toString(), StaticValues.deviceMapForSelectedController);
-                //schedularDetails.put("controllerName", controllerName);
-                //schedularDetails.put("deviceName", txtTitle.getText().toString());
                 schedule.setControllerName(controllerName);
                 schedule.setDeviceName(txtTitle.getText().toString());
                 initiatePopupWindow(view);
@@ -125,7 +135,10 @@ public class CustomList extends ArrayAdapter<String> {
                 }
                 controllerId=StaticValues.controllerId;
                 topic=StaticValues.topicMap.get(controllerId);
-                securtiyToken=StaticValues.topicMap.get(controllerId);
+                securtiyToken=StaticValues.securityMap.get(controllerId);
+                System.out.println("check controller id : " + controllerId);
+                System.out.println("check topic : " + topic);
+                System.out.println("check security token : " + securtiyToken);
                 if(position==0){
                     if(isFanOn){
                         isFanOn=false;
@@ -152,6 +165,7 @@ public class CustomList extends ArrayAdapter<String> {
                 }
                 TestMQTT testMQTT=new TestMQTT();
                 testMQTT.doDemo(topic, signal, deviceId, securtiyToken);
+
                 new MyAsyncTask().execute();
             }
         });
@@ -160,16 +174,12 @@ public class CustomList extends ArrayAdapter<String> {
 
     private void initiatePopupWindow(final View v) {
         try {
-            //layout = (RelativeLayout) v.findViewById(R.id.popup_element_add);
-            //We need to get the instance of the LayoutInflater, use the context of this activity
             layoutInflator = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-            //Inflate the view from a predefined XML layout
             final View layout = layoutInflator.inflate(R.layout.timer,
                         (ViewGroup) v.findViewById(R.id.popup_timer));
 
-            popupWindow = new PopupWindow(layout, 1000, 700, true);
-            popupWindow.showAtLocation(layout, Gravity.CENTER, 0, 150);
+            popupWindow = new PopupWindow(layout, 1000, 750, true);
+            popupWindow.showAtLocation(layout, Gravity.CENTER, 0, 170);
             popupWindow.setFocusable(true);
             /*layout.setOnTouchListener(new View.OnTouchListener(){
                 @Override
@@ -182,13 +192,8 @@ public class CustomList extends ArrayAdapter<String> {
             TextView textView = (TextView) toolbar.findViewById(R.id.tv_toolbar);
             ImageButton closePopup = (ImageButton) toolbar.findViewById(R.id.close_popup);
             final ImageButton toggleButton=(ImageButton) layout.findViewById(R.id.toggleButton);
-            //schedularDetails.put("status", schedularDeviceStatus);
             btnSaveTimer=(Button) layout.findViewById(R.id.saveTimer);
             btnSaveTimer.setEnabled(false);
-            //DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            //Date dateobj = new Date();
-            //startDate=df.format(dateobj);
-            //endDate=df.format(dateobj);
             closePopup.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -196,8 +201,7 @@ public class CustomList extends ArrayAdapter<String> {
                     popupWindow.dismiss();
                  }
             });
-            //sdf = new SimpleDateFormat("HH:mm");
-            textView.setText("SCHEDULAR");
+            textView.setText("SCHEDULE DETAILS");
             etTimer=(EditText)layout.findViewById(R.id.editTime);
             etTimer.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -209,9 +213,6 @@ public class CustomList extends ArrayAdapter<String> {
                   mTimePicker = new TimePickerDialog(context, new TimePickerDialog.OnTimeSetListener() {
                        @Override
                        public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                           Date date = new Date();
-                           //String sysTime=sdf.format(date);
-                           //System.out.println("System Time : " + sysTime);
                            etTimer.setText(selectedHour + ":" + selectedMinute);
                            startTime=etTimer.getText().toString();
                            endTime=etTimer.getText().toString();
@@ -219,30 +220,15 @@ public class CustomList extends ArrayAdapter<String> {
                                schedule.setTime(startTime);
                                btnSaveTimer.setEnabled(true);
                            }
-                           /*try {
-                               Date d1=sdf.parse(sysTime);
-                               Date d2=sdf.parse(startTime);
-                               if((d2.getTime()-d1.getTime())>0){
-                                   schedule.setTime(startTime);
-                                   btnSaveTimer.setEnabled(true);
-                               }
-                               else{
-                                   Toast.makeText(context, "Selected time cannot be less than current time", Toast.LENGTH_SHORT).show();
-                               }
-                           } catch (ParseException e) {
-                               e.printStackTrace();
-                           }*/
-                           //schedularDetails.put("time", startTime);
                            }
                        }, hour, minute, true);//Yes 24 hour time
-                        //mTimePicker.setTitle("SET TIMER");
+                        //mTimePicker.setTitle("SET TIME");
                   mTimePicker.show();
                   }
             });
             btnSaveTimer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //schedularDetails.put("status", schedularDeviceStatus);
                     schedule.setAction(schedularDeviceStatus);
                     deviceActionMode="E";
                     description="ENABLE SCHEDULAR";
@@ -282,7 +268,7 @@ public class CustomList extends ArrayAdapter<String> {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            //pDialog = new ProgressDialog(RoomActivity.this);
+            //pDialog = new ProgressDialog(context);
             //pDialog.setMessage("Please wait...");
             //pDialog.setCancelable(false);
             //pDialog.show();
@@ -313,7 +299,6 @@ public class CustomList extends ArrayAdapter<String> {
                     return StaticValues.deviceActionServiceDown;
                 }
             }
-
             if(deviceActionMode.equals("E")){
                 try{
                     HTTPURLConnection httpurlConnection = new HTTPURLConnection();
@@ -334,12 +319,12 @@ public class CustomList extends ArrayAdapter<String> {
                     }
                     catch (Exception e){
                         e.printStackTrace();
-                        return StaticValues.deviceActionResponseIssue;
+                        return StaticValues.scheduleDeviceServiceResponseDown;
                     }
                 }
                 catch (Exception e){
                     e.printStackTrace();
-                    return StaticValues.deviceActionServiceDown;
+                    return StaticValues.scheduleDeviceServiceDown;
                 }
             }
             return response;
@@ -348,18 +333,16 @@ public class CustomList extends ArrayAdapter<String> {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            //Toast.makeText(CustomList.this.getActivity(), result, Toast.LENGTH_LONG).show();
             System.out.println(result);
-
             if(deviceActionMode.equals("U")){
                 myDb.updateStatusData(deviceId, signal);
+                StaticValues.statusMap=myDb.readStatusData(StaticValues.USERNAME);
             }
-
             if(deviceActionMode.equals("E")){
                 myDb.insertScheduleData(controllerId, deviceId, schedularDeviceStatus, startTime, "OPEN");
             }
             //if (pDialog.isShowing())
-            //  pDialog.dismiss();
+                //pDialog.dismiss();
         }
     }
 }

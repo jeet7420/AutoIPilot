@@ -14,7 +14,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -24,8 +28,8 @@ public class SchedularGridActivity extends Fragment {
     GridView grid;
     String[] schedulesArray;
     Integer[] imagesArray;
-    HashMap<String, String> schedulesMapLocal;
     int numberOfSchedules=0;
+    TextView tvNoSchedules;
     String action="";
     int position;
 
@@ -35,10 +39,12 @@ public class SchedularGridActivity extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.activity_schedular, container, false);
+        tvNoSchedules=(TextView)view.findViewById(R.id.tvNoSchedules);
         numberOfSchedules=StaticValues.schedules.size();
         System.out.println("NUMBER OF SCHEDULES : " + numberOfSchedules);
         System.out.println(StaticValues.schedules);
         if(numberOfSchedules>0){
+            tvNoSchedules.setVisibility(View.GONE);
             schedulesArray=new String[numberOfSchedules];
             imagesArray=new Integer[numberOfSchedules];
             position=1;
@@ -46,11 +52,8 @@ public class SchedularGridActivity extends Fragment {
 
             while(iterator.hasNext()){
                 System.out.println("SCHEDULE POSITION : " + position);
-                //Map.Entry entry= (Map.Entry) iterator.next();
-                //schedulesMapLocal=new HashMap<String, String>();
                 schedule=new Schedule();
                 schedule=(Schedule)iterator.next();
-                //position=(int) entry.getKey();
                 if("1".equals(schedule.getAction()))
                     action="On";
                 if("0".equals(schedule.getAction()))
@@ -63,12 +66,6 @@ public class SchedularGridActivity extends Fragment {
             CustomGrid adapter = new CustomGrid(SchedularGridActivity.this.getActivity(), schedulesArray, imagesArray);
             grid=(GridView)view.findViewById(R.id.grid);
             grid.setAdapter(adapter);
-            grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    //Toast.makeText(SchedularGridActivity.this, "You Clicked at " +schedule[+ position], Toast.LENGTH_SHORT).show();
-                }
-            });
         }
         return view;
     }

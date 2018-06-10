@@ -29,9 +29,19 @@
             android:layout_height="wrap_content"
             android:scaleType="fitXY"
             android:layout_centerInParent="true"
-            android:background="@drawable/bedroomwall"/>
+            android:background="@drawable/scheduleswall"/>
 
     </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:textColor="@color/colorGreyDark"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:id="@+id/tvNoSchedules"
+        android:text="NO PENDING SCHEDULES FOUND"
+        android:layout_height="wrap_content" />
 
     <GridView
         android:numColumns="1"

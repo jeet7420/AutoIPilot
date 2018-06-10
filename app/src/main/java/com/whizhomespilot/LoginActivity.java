@@ -43,14 +43,12 @@ import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
 
-    String name, firstname, lastname, email, dob, gender;
+    String name, firstname, lastname, email;
     HashMap<String, String> postDataParams;
     private static final int REQUEST_CODE = 10;
-    private HTTPURLConnection service;
     EditText etUsername, etPassword;
     private ProgressDialog pDialog;
-    private SignInButton login;
-    private String controllerId, deviceId, deivceName;
+    private String controllerId;
     HashMap<String, String> innerMap;
     private ImageButton loginButton;
     private GoogleApiClient googleApiClient;
@@ -68,22 +66,12 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         mContext=this;
         Window window = LoginActivity.this.getWindow();
 
-// clear FLAG_TRANSLUCENT_STATUS flag:
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
-// add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
-// finally change the color
         window.setStatusBarColor(ContextCompat.getColor(LoginActivity.this,R.color.colorTeal));
 
-        /*getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorBlack)));
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(R.layout.actionbar);
-        TextView title=(TextView)findViewById(getResources().getIdentifier("action_bar_title", "id", getPackageName()));
-        title.setText("WHIZ HOMES");*/
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //getSupportActionBar().setHomeButtonEnabled(true);
         myDb = new DatabaseHelper(this);
 
         myDb.purgeControllerData(StaticValues.USERNAME);
@@ -101,9 +89,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             public void onClick(View view) {
                 username=etUsername.getText().toString();
                 password=etPassword.getText().toString();
-                mode="C";
-                StaticValues.USERNAME=username;
-                new MyAsyncTask().execute();
+                if("".equals(username) || "".equals(password)){
+                    Toast.makeText(getApplicationContext(), "Please enter both username and password", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    mode="C";
+                    StaticValues.USERNAME=username;
+                    new MyAsyncTask().execute();
+                }
             }
         });
 
@@ -127,16 +120,12 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
 
         loginButton = (ImageButton) findViewById(R.id.googlesignin);
-        //login.setStyle(SignInButton.SIZE_WIDE, SignInButton.COLOR_DARK);
-        //login.setScopes(googleSignInOptions.getScopeArray());
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
                 startActivityForResult(signInIntent,REQUEST_CODE);
-                //Intent sendData = new Intent(MainActivity.this, UserDetails.class);
-                //startActivity(sendData);
             }
         });
     }
@@ -153,19 +142,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 String str[] = name.split(" ");
                 firstname = str[0];
                 lastname = str[1];
-                /*dob = profile.getBirthday();
-                if(profile.getGender() == 0){
-                    gender = "m";
-                }
-                if(profile.getGender() == 1){
-                    gender = "f";
-                }*/
                 email = account.getEmail();
                 StaticValues.USERNAME=email;
                 Toast.makeText(getApplicationContext(), email, Toast.LENGTH_LONG).show();
                 mode="G";
-                //Toast.makeText(MainActivity.this, currentLocation, Toast.LENGTH_LONG).show();
-                //dpurl = account.getPhotoUrl().toString();
                 new MyAsyncTask().execute();
             }
             catch (Exception e) {
@@ -258,7 +238,7 @@ private class MyAsyncTask extends AsyncTask<Void, Void, String> {
                     System.out.println("CHECK 2 : " + StaticValues.serverResult.get("controllers"));
                     System.out.println("CHECK 3 : " + StaticValues.serverResult.get("security"));
                     System.out.println("CHECK 4 : " + StaticValues.serverResult.get("topic"));
-                    System.out.println("CHECK 5 : " + StaticValues.serverResult.get("deviceStatus"));
+                    System.out.println("CHECK 5 : " + StaticValues.serverResult.get("status"));
                     System.out.println("CHECK 6 : " + StaticValues.serverResult.get("profile"));
                 }
                 try{
@@ -294,25 +274,16 @@ private class MyAsyncTask extends AsyncTask<Void, Void, String> {
                 else if(result.equals("200")){
                     Toast.makeText(getApplicationContext(), "NEW PASSWORD SENT TO EMAIL ID", Toast.LENGTH_LONG).show();
                 }
-                /*else if(result.equals("F")){
-                    Toast.makeText(getApplicationContext(), "ADMIN LOGIN SUCCESSFULL", Toast.LENGTH_LONG).show();
-                    Intent loginAdminIntent=new Intent(LoginActivity.this,MainActivity.class);
-                    LoginActivity.this.startActivity(loginAdminIntent);
-                }
-                else if(result.equals("P")){
-                    Toast.makeText(getApplicationContext(), "USER LOGIN SUCCESSFULL", Toast.LENGTH_LONG).show();
-                    Intent loginUserIntent=new Intent(LoginActivity.this,MainActivity.class);
-                    LoginActivity.this.startActivity(loginUserIntent);
-                }*/
                 else{
-                    StaticValues.userProfileMap=StaticValues.serverResult.get("profile");
-                    Iterator iteratorUserProfileMap=StaticValues.userProfileMap.entrySet().iterator();
-                    while(iteratorUserProfileMap.hasNext()){
-                        Map.Entry entry= (Map.Entry) iteratorUserProfileMap.next();
-                        myDb.insertUserProfileData(entry.getKey().toString(), entry.getValue().toString());
+                    if((StaticValues.serverResult.get("profile"))!=null){
+                        StaticValues.userProfileMap=StaticValues.serverResult.get("profile");
+                        Iterator iteratorUserProfileMap=StaticValues.userProfileMap.entrySet().iterator();
+                        while(iteratorUserProfileMap.hasNext()){
+                            Map.Entry entry= (Map.Entry) iteratorUserProfileMap.next();
+                            myDb.insertUserProfileData(entry.getKey().toString(), entry.getValue().toString());
+                        }
+                        myDb.printUserProfileData(StaticValues.USERNAME);
                     }
-                    myDb.printUserProfileData(StaticValues.USERNAME);
-                    //StaticValues.homeMap=StaticValues.serverResult.get("homeId");
                     StaticValues.controllerMap=StaticValues.serverResult.get("controllers");
                     if(StaticValues.controllerMap.size()==0){
                         StaticValues.isUserNew=true;
@@ -355,7 +326,7 @@ private class MyAsyncTask extends AsyncTask<Void, Void, String> {
                             myDb.insertTopicData(entry.getKey().toString(), entry.getValue().toString());
                         }
 
-                        StaticValues.statusMap=StaticValues.serverResult.get("deviceStatus");
+                        StaticValues.statusMap=StaticValues.serverResult.get("status");
                         Iterator iteratorStatusMap=StaticValues.statusMap.entrySet().iterator();
                         while(iteratorStatusMap.hasNext()){
                             Map.Entry entry= (Map.Entry) iteratorStatusMap.next();
@@ -365,10 +336,10 @@ private class MyAsyncTask extends AsyncTask<Void, Void, String> {
                         StaticValues.loginUsed=true;
                         myDb.printControllerData(StaticValues.USERNAME);
                         myDb.printDeviceData(StaticValues.USERNAME);
-                        myDb.printUserProfileData(StaticValues.USERNAME);
-                        //myDb.printSchedularData(StaticValues.USERNAME);
+                        myDb.printSecurityData(StaticValues.USERNAME);
+                        myDb.printTopicData(StaticValues.USERNAME);
+                        myDb.printStatusData(StaticValues.USERNAME);
                     }
-                    //StaticValues.deviceMap=StaticValues.serverResult.get("homeId");
                     Toast.makeText(getApplicationContext(), "LOGIN SUCCESSFULL", Toast.LENGTH_LONG).show();
                     SaveSharedPreference.setUserName(mContext, StaticValues.USERNAME);
                     Intent loginIntent=new Intent(LoginActivity.this,MainActivity.class);

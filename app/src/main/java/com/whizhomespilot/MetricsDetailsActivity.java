@@ -57,9 +57,7 @@ public class MetricsDetailsActivity extends Fragment {
     List<String> deviceList=new ArrayList<String>();
     ArrayAdapter<String> roomsAdapter, devicesAdapter;
     HashMap<String, String> postDataParams;
-    Spinner spinnerController, spinnerDevice, spinnerYear, spinnerControllerNames;
     ImageButton btnSubmit;
-    String selectedController=" ";
     String selectedDevice, selectedYear;
     String controllerId, deviceId;
     String controllerType;
@@ -84,7 +82,7 @@ public class MetricsDetailsActivity extends Fragment {
                              Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.activity_select_details_for_metrics, container, false);
         context=this.getActivity();
-        mYear = getResources().getStringArray(R.array.year_array);
+        //mYear = getResources().getStringArray(R.array.year_array);
         btnSubmit=(ImageButton)view.findViewById(R.id.btnSubmit);
         mChart = (CombinedChart)view.findViewById(R.id.chart1);
         mChart.setVisibility(View.INVISIBLE);
@@ -94,8 +92,8 @@ public class MetricsDetailsActivity extends Fragment {
         ViewGroup parent = (ViewGroup) C.getParent();
         int index = parent.indexOfChild(C);
         parent.removeView(C);
-        ImageButton btnRooms=(ImageButton)view.findViewById(R.id.btnRooms);
-        ImageButton btnDevices=(ImageButton)view.findViewById(R.id.btnDevices);
+        final ImageButton btnRooms=(ImageButton)view.findViewById(R.id.btnRooms);
+        final ImageButton btnDevices=(ImageButton)view.findViewById(R.id.btnDevices);
 
         listPopupForRooms = new ListPopupWindow(this.getActivity());
         listPopupForDevices = new ListPopupWindow(this.getActivity());
@@ -126,6 +124,18 @@ public class MetricsDetailsActivity extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 StaticValues.deviceList.clear();
                 selectedControllerName=StaticValues.controllerList.get(i);
+                if("Bedroom".equals(selectedControllerName)) {
+                    btnRooms.setImageResource(R.drawable.bedroomlov);
+                }
+                if("Hall".equals(selectedControllerName)) {
+                    btnRooms.setImageResource(R.drawable.halllov);
+                }
+                if("Bathroom".equals(selectedControllerName)) {
+                    btnRooms.setImageResource(R.drawable.bathroomlov);
+                }
+                if("Kitchen".equals(selectedControllerName)) {
+                    btnRooms.setImageResource(R.drawable.kitchenlov);
+                }
                 listPopupForRooms.dismiss();
             }
         });
@@ -133,6 +143,7 @@ public class MetricsDetailsActivity extends Fragment {
         listPopupForRooms.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
+                StaticValues.deviceList.clear();
                 selectedControllerId=StaticValues.getControllerId(selectedControllerName);
                 getDeviceMapForSelectedController=StaticValues.getDeviceMapForSelectedController(selectedControllerId);
                 StaticValues.deviceList.addAll(getDeviceMapForSelectedController.values());
@@ -146,19 +157,31 @@ public class MetricsDetailsActivity extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 selectedDeviceName=StaticValues.deviceList.get(i);
+                if("Fan".equals(selectedDeviceName)) {
+                    btnDevices.setImageResource(R.drawable.fanlov);
+                }
+                if("Light".equals(selectedDeviceName)) {
+                    btnDevices.setImageResource(R.drawable.lightlov);
+                }
+                if("Geysor".equals(selectedDeviceName)) {
+                    btnDevices.setImageResource(R.drawable.geysorlov);
+                }
+                if("3-Pin".equals(selectedDeviceName)) {
+                    btnDevices.setImageResource(R.drawable.pinlov);
+                }
                 selectedDeviceId=StaticValues.getDeviceId(selectedDeviceName, getDeviceMapForSelectedController);
                 listPopupForDevices.dismiss();
             }
         });
 
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
+        /*btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 chartImage.setEnabled(false);
                 mChart.setEnabled(true);
                 new MyAsyncTask().execute();
             }
-        });
+        });*/
         // Inflate the layout for this fragment
         return view;
     }
