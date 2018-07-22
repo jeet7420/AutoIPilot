@@ -145,7 +145,11 @@ public class MainActivity extends AppCompatActivity {
 
         System.out.println("NAME : " + username);
 
-        name.setText(username.substring(0, username.indexOf(' ')));
+        if(username.contains(" "))
+            name.setText(username.substring(0, username.indexOf(' ')));
+        else
+            name.setText(username);
+
 
         editProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -227,7 +231,9 @@ public class MainActivity extends AppCompatActivity {
             else{
                 if("".equals(StaticValues.controllerName)){
                     navItemIndex = 2;
-                    StaticValues.controllerName=drawerItems.get(navItemIndex-1);
+                    if(drawerItems.size()>=navItemIndex+1){
+                        StaticValues.controllerName=drawerItems.get(navItemIndex-1);
+                    }
                 }
                 getSelectedFragment();
             }
@@ -285,22 +291,24 @@ public class MainActivity extends AppCompatActivity {
             pos=position-1;
             navItemIndex=pos+1;
             System.out.println("position : " + pos);
-            selectedDrawerItem=drawerItems.get(navItemIndex-1);
-            if(selectedDrawerItem.equals(StaticValues.ADDNEWCONTROLLER) ||
-               selectedDrawerItem.equals(StaticValues.EDITCONTROLLER) ||
-               selectedDrawerItem.equals(StaticValues.USERPROFILE) ||
-               selectedDrawerItem.equals(StaticValues.SCHEDULAR) ||
-               selectedDrawerItem.equals(StaticValues.METRICS) ||
-               selectedDrawerItem.equals(StaticValues.ABOUTUS) ||
-               selectedDrawerItem.equals(StaticValues.CONTACTUS) ||
-               selectedDrawerItem.equals(StaticValues.LOGOUT)){
-                StaticValues.fragmentName=drawerItems.get(navItemIndex-1);
-                StaticValues.controllerName="";
-            }
-            else{
-                StaticValues.isUserNew=false;
-                StaticValues.fragmentName=StaticValues.CONTROLLER;
-                StaticValues.controllerName=drawerItems.get(navItemIndex-1);
+            if(drawerItems.size()>=navItemIndex){
+                selectedDrawerItem=drawerItems.get(navItemIndex-1);
+                if(selectedDrawerItem.equals(StaticValues.ADDNEWCONTROLLER) ||
+                        selectedDrawerItem.equals(StaticValues.EDITCONTROLLER) ||
+                        selectedDrawerItem.equals(StaticValues.USERPROFILE) ||
+                        selectedDrawerItem.equals(StaticValues.SCHEDULAR) ||
+                        selectedDrawerItem.equals(StaticValues.METRICS) ||
+                        selectedDrawerItem.equals(StaticValues.ABOUTUS) ||
+                        selectedDrawerItem.equals(StaticValues.CONTACTUS) ||
+                        selectedDrawerItem.equals(StaticValues.LOGOUT)){
+                    StaticValues.fragmentName=drawerItems.get(navItemIndex-1);
+                    StaticValues.controllerName="";
+                }
+                else{
+                    StaticValues.isUserNew=false;
+                    StaticValues.fragmentName=StaticValues.CONTROLLER;
+                    StaticValues.controllerName=drawerItems.get(navItemIndex-1);
+                }
             }
             System.out.println("Item Clicked at position : " + navItemIndex + " controller : " + StaticValues.controllerName);
             getSelectedFragment();
@@ -425,8 +433,9 @@ public class MainActivity extends AppCompatActivity {
             layoutInflator = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             final View layout = layoutInflator.inflate(R.layout.change_password,
                     (ViewGroup) v.findViewById(R.id.popup_change_password));
-            popupWindow = new PopupWindow(layout, 1000, 700, true);
-            popupWindow.showAtLocation(layout, Gravity.CENTER, 0, 150);
+            //popupWindow = new PopupWindow(layout, 1000, 700, true);
+            popupWindow = new PopupWindow(layout, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+            popupWindow.showAtLocation(layout, Gravity.CENTER, 0, 0);
             popupWindow.setFocusable(true);
             Toolbar toolbar = (Toolbar) layout.findViewById(R.id.mytoolbar);
             TextView textView = (TextView) toolbar.findViewById(R.id.tv_toolbar);
@@ -485,7 +494,8 @@ public class MainActivity extends AppCompatActivity {
                 postDataParams.put("password", newPassword);
                 jsonResponse = httpurlConnection.invokeService(StaticValues.changePasswordURL, postDataParams);
                 try {
-                    response = jsonResponse.get("response").toString();
+                    if(jsonResponse!=null)
+                        response = jsonResponse.get("response").toString();
                 } catch (Exception e) {
                     e.printStackTrace();
                     return StaticValues.changePasswordServiceDown;

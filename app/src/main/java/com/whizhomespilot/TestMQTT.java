@@ -15,13 +15,15 @@ public class TestMQTT {
         try {
             System.out.println("PAYLOAD : " + securityToken+"-"+deviceId+status);
             client = new MqttClient("tcp://45.113.138.18:1883", topic, persistence);
-            client.connect();
-            MqttMessage message = new MqttMessage();
-            message.setPayload((securityToken+"-"+deviceId+status).getBytes());
-            System.out.println("PAYLOAD : " + securityToken+"-"+deviceId+status);
-            client.publish(topic, message);
-            client.disconnect();
-            System.out.println("After");
+            if(client!=null && topic!=null && persistence!=null){
+                client.connect();
+                MqttMessage message = new MqttMessage();
+                message.setPayload((securityToken+"-"+deviceId+status).getBytes());
+                System.out.println("PAYLOAD : " + securityToken+"-"+deviceId+status);
+                client.publish(topic, message);
+                client.disconnect();
+                System.out.println("After");
+            }
         } catch (MqttException e) {
             e.printStackTrace();
             e.getMessage();

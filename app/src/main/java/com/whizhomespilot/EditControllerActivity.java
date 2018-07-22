@@ -109,20 +109,22 @@ public class EditControllerActivity extends Fragment {
     public static HashMap<String, HashMap<String,String>> jsonToHashMap(JSONObject object) throws JSONException {
         HashMap<String, HashMap<String,String>> map = new HashMap<String, HashMap<String,String>>();
         HashMap<String, String> innerMap=null;
-        Iterator<String> keysItrOuter = object.keys();
-        while(keysItrOuter.hasNext()) {
-            String keyOuter = keysItrOuter.next();
-            Object valueOuter = object.get(keyOuter);
-            JSONObject innerJsonObject = (JSONObject)valueOuter;
-            Iterator<String> keysItrInner = innerJsonObject.keys();
-            innerMap = new HashMap<String, String>();
-            while(keysItrInner.hasNext()){
-                String keyInner = keysItrInner.next();
-                Object valueInner = innerJsonObject.get(keyInner);
-                String valueInnerAsString = valueInner.toString();
-                innerMap.put(keyInner, valueInnerAsString);
+        if(object!=null){
+            Iterator<String> keysItrOuter = object.keys();
+            while(keysItrOuter.hasNext()) {
+                String keyOuter = keysItrOuter.next();
+                Object valueOuter = object.get(keyOuter);
+                JSONObject innerJsonObject = (JSONObject)valueOuter;
+                Iterator<String> keysItrInner = innerJsonObject.keys();
+                innerMap = new HashMap<String, String>();
+                while(keysItrInner.hasNext()){
+                    String keyInner = keysItrInner.next();
+                    Object valueInner = innerJsonObject.get(keyInner);
+                    String valueInnerAsString = valueInner.toString();
+                    innerMap.put(keyInner, valueInnerAsString);
+                }
+                map.put(keyOuter, innerMap);
             }
-            map.put(keyOuter, innerMap);
         }
         return map;
     }
@@ -149,8 +151,12 @@ public class EditControllerActivity extends Fragment {
                 jsonResponse = httpurlConnection.invokeServiceForMap(StaticValues.editControllerURL, postDataParams);
                 StaticValues.serverResult=jsonToHashMap(jsonResponse);
                 try{
-                    jsonObject=(JSONObject)jsonResponse.get("response");
-                    response=jsonObject.get("status").toString();
+                    if(jsonResponse!=null){
+                        jsonObject=(JSONObject)jsonResponse.get("response");
+                        if(jsonObject!=null)
+                            response=jsonObject.get("status").toString();
+                    }
+
                 }
                 catch (Exception e){
                     e.printStackTrace();

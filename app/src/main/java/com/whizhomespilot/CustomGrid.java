@@ -133,7 +133,8 @@ public class CustomGrid extends BaseAdapter{
                     postDataParams.put("mode",deviceActionMode);
                     jsonResponse = httpurlConnection.invokeService(StaticValues.scheduleDeviceURL, postDataParams);
                     try{
-                        response=jsonResponse.get("status").toString();
+                        if(jsonResponse!=null)
+                            response=jsonResponse.get("status").toString();
                     }
                     catch (Exception e){
                         e.printStackTrace();

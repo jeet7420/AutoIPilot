@@ -72,7 +72,12 @@ public class RegisterActivity extends AppCompatActivity {
                 if("".equals(name) || "".equals(password) || "".equals(email) || "".equals(phone)){
                     Toast.makeText(getApplicationContext(), "Please provide values for all fields", Toast.LENGTH_SHORT).show();
                 }
-
+                else if(!(email.contains("@"))){
+                    Toast.makeText(getApplicationContext(), "Invalid Email Id", Toast.LENGTH_SHORT).show();
+                }
+                else if(!(phone.length()==10)){
+                        Toast.makeText(getApplicationContext(), "Phone number should be of 10 digits", Toast.LENGTH_SHORT).show();
+                }
                 else
                     new RegisterActivity.MyAsyncTask().execute();
             }
@@ -103,9 +108,11 @@ public class RegisterActivity extends AppCompatActivity {
                 postDataParams.put("mode",mode);
                 jsonResponse = httpurlConnection.invokeService(StaticValues.registerURL, postDataParams);
                 try{
-                    response=jsonResponse.get("key").toString();
-                    name=jsonResponse.get("userName").toString();
-                    email=jsonResponse.get("email").toString();
+                    if(jsonResponse!=null){
+                        response=jsonResponse.get("key").toString();
+                        name=jsonResponse.get("userName").toString();
+                        email=jsonResponse.get("email").toString();
+                    }
                 }
                 catch (Exception e){
                     e.printStackTrace();
@@ -133,10 +140,12 @@ public class RegisterActivity extends AppCompatActivity {
                 else if(result.equals("1")){
                     StaticValues.userProfileMap.put(StaticValues.UserNameKey,name);
                     StaticValues.userProfileMap.put(StaticValues.UserEmailIdKey,email);
-                    Iterator iteratorUserProfileMap=StaticValues.userProfileMap.entrySet().iterator();
-                    while(iteratorUserProfileMap.hasNext()){
-                        Map.Entry entry= (Map.Entry) iteratorUserProfileMap.next();
-                        myDb.insertUserProfileData(entry.getKey().toString(), entry.getValue().toString());
+                    if(StaticValues.userProfileMap!=null){
+                        Iterator iteratorUserProfileMap=StaticValues.userProfileMap.entrySet().iterator();
+                        while(iteratorUserProfileMap.hasNext()){
+                            Map.Entry entry= (Map.Entry) iteratorUserProfileMap.next();
+                            myDb.insertUserProfileData(entry.getKey().toString(), entry.getValue().toString());
+                        }
                     }
                     myDb.printUserProfileData(StaticValues.USERNAME);
                     StaticValues.isUserNew=true;

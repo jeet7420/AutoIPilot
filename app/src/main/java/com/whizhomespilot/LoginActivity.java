@@ -138,15 +138,17 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             GoogleSignInAccount account = result.getSignInAccount();
             try{
-                name = account.getDisplayName();
-                String str[] = name.split(" ");
-                firstname = str[0];
-                lastname = str[1];
-                email = account.getEmail();
-                StaticValues.USERNAME=email;
-                Toast.makeText(getApplicationContext(), email, Toast.LENGTH_LONG).show();
-                mode="G";
-                new MyAsyncTask().execute();
+                if(account!=null){
+                    name = account.getDisplayName();
+                    String str[] = name.split(" ");
+                    firstname = str[0];
+                    lastname = str[1];
+                    email = account.getEmail();
+                    StaticValues.USERNAME=email;
+                    Toast.makeText(getApplicationContext(), email, Toast.LENGTH_LONG).show();
+                    mode="G";
+                    new MyAsyncTask().execute();
+                }
             }
             catch (Exception e) {
                 Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -166,20 +168,22 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     public static HashMap<String, HashMap<String,String>> jsonToHashMap(JSONObject object) throws JSONException {
         HashMap<String, HashMap<String,String>> map = new HashMap<String, HashMap<String,String>>();
         HashMap<String, String> innerMap=null;
-        Iterator<String> keysItrOuter = object.keys();
-        while(keysItrOuter.hasNext()) {
-            String keyOuter = keysItrOuter.next();
-            Object valueOuter = object.get(keyOuter);
-            JSONObject innerJsonObject = (JSONObject)valueOuter;
-            Iterator<String> keysItrInner = innerJsonObject.keys();
-            innerMap = new HashMap<String, String>();
-            while(keysItrInner.hasNext()){
-                String keyInner = keysItrInner.next();
-                Object valueInner = innerJsonObject.get(keyInner);
-                String valueInnerAsString = valueInner.toString();
-                innerMap.put(keyInner, valueInnerAsString);
+        if(object!=null){
+            Iterator<String> keysItrOuter = object.keys();
+            while(keysItrOuter.hasNext()) {
+                String keyOuter = keysItrOuter.next();
+                Object valueOuter = object.get(keyOuter);
+                JSONObject innerJsonObject = (JSONObject)valueOuter;
+                Iterator<String> keysItrInner = innerJsonObject.keys();
+                innerMap = new HashMap<String, String>();
+                while(keysItrInner.hasNext()){
+                    String keyInner = keysItrInner.next();
+                    Object valueInner = innerJsonObject.get(keyInner);
+                    String valueInnerAsString = valueInner.toString();
+                    innerMap.put(keyInner, valueInnerAsString);
+                }
+                map.put(keyOuter, innerMap);
             }
-            map.put(keyOuter, innerMap);
         }
         return map;
     }
@@ -210,14 +214,16 @@ private class MyAsyncTask extends AsyncTask<Void, Void, String> {
                     postDataParams=new HashMap<String, String>();
                     postDataParams.put("email",username);
                     jsonResponse = httpurlConnection.invokeService(StaticValues.sendTemporaryPassword, postDataParams);
-                    StaticValues.serverResult=jsonToHashMap(jsonResponse);
+                    if(jsonResponse!=null)
+                        StaticValues.serverResult=jsonToHashMap(jsonResponse);
                 }
                 if(mode.equals("C")){
                     postDataParams=new HashMap<String, String>();
                     postDataParams.put("email",username);
                     postDataParams.put("password",password);
                     jsonResponse = httpurlConnection.invokeService(StaticValues.loginURL, postDataParams);
-                    StaticValues.serverResult=jsonToHashMap(jsonResponse);
+                    if(jsonResponse!=null)
+                        StaticValues.serverResult=jsonToHashMap(jsonResponse);
                     //StaticValues.deviceStatus=StaticValues.serverResult.get("Devices");
                     System.out.println("CHECK 1 : " + StaticValues.serverResult.get("homeId"));
                     System.out.println("CHECK 2 : " + StaticValues.serverResult.get("controllers"));
@@ -232,7 +238,8 @@ private class MyAsyncTask extends AsyncTask<Void, Void, String> {
                     postDataParams.put("name",name);
                     postDataParams.put("mode",mode);
                     jsonResponse = httpurlConnection.invokeService(StaticValues.googleSignInURL, postDataParams);
-                    StaticValues.serverResult=jsonToHashMap(jsonResponse);
+                    if(jsonResponse!=null)
+                        StaticValues.serverResult=jsonToHashMap(jsonResponse);
                     //StaticValues.deviceStatus=StaticValues.serverResult.get("Devices");
                     System.out.println("CHECK 1 : " + StaticValues.serverResult.get("homeId"));
                     System.out.println("CHECK 2 : " + StaticValues.serverResult.get("controllers"));
@@ -242,8 +249,13 @@ private class MyAsyncTask extends AsyncTask<Void, Void, String> {
                     System.out.println("CHECK 6 : " + StaticValues.serverResult.get("profile"));
                 }
                 try{
-                    jsonObject=(JSONObject)jsonResponse.get("homeId");
-                    response=jsonObject.get("homeId").toString();
+                    if(jsonResponse!=null)
+                    {
+                        jsonObject=(JSONObject)jsonResponse.get("homeId");
+                        if(jsonObject!=null)
+                            response=jsonObject.get("homeId").toString();
+                    }
+
                 }
                 catch (Exception e){
                     e.printStackTrace();
@@ -285,60 +297,67 @@ private class MyAsyncTask extends AsyncTask<Void, Void, String> {
                         myDb.printUserProfileData(StaticValues.USERNAME);
                     }
                     StaticValues.controllerMap=StaticValues.serverResult.get("controllers");
-                    if(StaticValues.controllerMap.size()==0){
-                        StaticValues.isUserNew=true;
-                    }
-                    else{
-                        Iterator iterator=StaticValues.controllerMap.entrySet().iterator();
-                        while(iterator.hasNext()){
-                            Map.Entry entry= (Map.Entry) iterator.next();
-                            myDb.insertControllerData(entry.getKey().toString(), entry.getValue().toString());
+                    if(StaticValues.controllerMap!=null){
+                        if(StaticValues.controllerMap.size()==0){
+                            StaticValues.isUserNew=true;
                         }
-                        Iterator iteratorControllerMap = StaticValues.controllerMap.entrySet().iterator();
-                        while (iteratorControllerMap.hasNext()) {
-                            Map.Entry entry = (Map.Entry)iteratorControllerMap.next();
-                            StaticValues.deviceMap.put(entry.getKey().toString(), StaticValues.serverResult.get(entry.getKey().toString()));
-                        }
-                        Iterator iteratorDeviceMap = StaticValues.deviceMap.entrySet().iterator();
-                        while (iteratorDeviceMap.hasNext()) {
-                            Map.Entry entry = (Map.Entry)iteratorDeviceMap.next();
-                            controllerId=entry.getKey().toString();
-                            innerMap=new HashMap<String, String>();
-                            innerMap=(HashMap<String, String>)entry.getValue();
-                            Iterator iteratorInnerDeviceMap = innerMap.entrySet().iterator();
-                            while(iteratorInnerDeviceMap.hasNext()){
-                                Map.Entry entry1=(Map.Entry)iteratorInnerDeviceMap.next();
-                                myDb.insertDeviceData(entry1.getKey().toString(), controllerId, entry1.getValue().toString());
+                        else{
+                            Iterator iterator=StaticValues.controllerMap.entrySet().iterator();
+                            while(iterator.hasNext()){
+                                Map.Entry entry= (Map.Entry) iterator.next();
+                                myDb.insertControllerData(entry.getKey().toString(), entry.getValue().toString());
                             }
-                        }
+                            Iterator iteratorControllerMap = StaticValues.controllerMap.entrySet().iterator();
+                            while (iteratorControllerMap.hasNext()) {
+                                Map.Entry entry = (Map.Entry)iteratorControllerMap.next();
+                                StaticValues.deviceMap.put(entry.getKey().toString(), StaticValues.serverResult.get(entry.getKey().toString()));
+                            }
+                            Iterator iteratorDeviceMap = StaticValues.deviceMap.entrySet().iterator();
+                            while (iteratorDeviceMap.hasNext()) {
+                                Map.Entry entry = (Map.Entry)iteratorDeviceMap.next();
+                                controllerId=entry.getKey().toString();
+                                innerMap=new HashMap<String, String>();
+                                innerMap=(HashMap<String, String>)entry.getValue();
+                                if(innerMap!=null){
+                                    Iterator iteratorInnerDeviceMap = innerMap.entrySet().iterator();
+                                    while(iteratorInnerDeviceMap.hasNext()){
+                                        Map.Entry entry1=(Map.Entry)iteratorInnerDeviceMap.next();
+                                        myDb.insertDeviceData(entry1.getKey().toString(), controllerId, entry1.getValue().toString());
+                                    }
+                                }
+                            }
 
-                        StaticValues.securityMap=StaticValues.serverResult.get("security");
-                        Iterator iteratorSecurityMap=StaticValues.securityMap.entrySet().iterator();
-                        while(iteratorSecurityMap.hasNext()){
-                            Map.Entry entry= (Map.Entry) iteratorSecurityMap.next();
-                            myDb.insertSecurityData(entry.getKey().toString(), entry.getValue().toString());
+                            StaticValues.securityMap=StaticValues.serverResult.get("security");
+                            if(StaticValues.securityMap!=null){
+                                Iterator iteratorSecurityMap=StaticValues.securityMap.entrySet().iterator();
+                                while(iteratorSecurityMap.hasNext()){
+                                    Map.Entry entry= (Map.Entry) iteratorSecurityMap.next();
+                                    myDb.insertSecurityData(entry.getKey().toString(), entry.getValue().toString());
+                                }
+                            }
+                            StaticValues.topicMap=StaticValues.serverResult.get("topic");
+                            if(StaticValues.topicMap!=null){
+                                Iterator iteratorTopicMap=StaticValues.topicMap.entrySet().iterator();
+                                while(iteratorTopicMap.hasNext()){
+                                    Map.Entry entry= (Map.Entry) iteratorTopicMap.next();
+                                    myDb.insertTopicData(entry.getKey().toString(), entry.getValue().toString());
+                                }
+                            }
+                            StaticValues.statusMap=StaticValues.serverResult.get("status");
+                            if(StaticValues.statusMap!=null){
+                                Iterator iteratorStatusMap=StaticValues.statusMap.entrySet().iterator();
+                                while(iteratorStatusMap.hasNext()){
+                                    Map.Entry entry= (Map.Entry) iteratorStatusMap.next();
+                                    myDb.insertStatusData(entry.getKey().toString(), entry.getValue().toString());
+                                }
+                            }
+                            StaticValues.loginUsed=true;
+                            myDb.printControllerData(StaticValues.USERNAME);
+                            myDb.printDeviceData(StaticValues.USERNAME);
+                            myDb.printSecurityData(StaticValues.USERNAME);
+                            myDb.printTopicData(StaticValues.USERNAME);
+                            myDb.printStatusData(StaticValues.USERNAME);
                         }
-
-                        StaticValues.topicMap=StaticValues.serverResult.get("topic");
-                        Iterator iteratorTopicMap=StaticValues.topicMap.entrySet().iterator();
-                        while(iteratorTopicMap.hasNext()){
-                            Map.Entry entry= (Map.Entry) iteratorTopicMap.next();
-                            myDb.insertTopicData(entry.getKey().toString(), entry.getValue().toString());
-                        }
-
-                        StaticValues.statusMap=StaticValues.serverResult.get("status");
-                        Iterator iteratorStatusMap=StaticValues.statusMap.entrySet().iterator();
-                        while(iteratorStatusMap.hasNext()){
-                            Map.Entry entry= (Map.Entry) iteratorStatusMap.next();
-                            myDb.insertStatusData(entry.getKey().toString(), entry.getValue().toString());
-                        }
-
-                        StaticValues.loginUsed=true;
-                        myDb.printControllerData(StaticValues.USERNAME);
-                        myDb.printDeviceData(StaticValues.USERNAME);
-                        myDb.printSecurityData(StaticValues.USERNAME);
-                        myDb.printTopicData(StaticValues.USERNAME);
-                        myDb.printStatusData(StaticValues.USERNAME);
                     }
                     Toast.makeText(getApplicationContext(), "LOGIN SUCCESSFULL", Toast.LENGTH_LONG).show();
                     SaveSharedPreference.setUserName(mContext, StaticValues.USERNAME);

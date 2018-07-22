@@ -16,6 +16,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -88,9 +89,11 @@ public class CustomList extends ArrayAdapter<String> {
         TextView txtTitle = (TextView) rowView.findViewById(R.id.txt);
         ImageView imageView = (ImageView) rowView.findViewById(R.id.img);
         final ImageButton imageButton = (ImageButton) rowView.findViewById(R.id.ib);
-        txtTitle.setText(deviceName[position]);
-        imageView.setImageResource(imageId[position]);
-        imageButton.setImageResource(buttonId[position]);
+        if(position<deviceName.length && position<imageId.length && position<buttonId.length){
+            txtTitle.setText(deviceName[position]);
+            imageView.setImageResource(imageId[position]);
+            imageButton.setImageResource(buttonId[position]);
+        }
         deviceIdArray[position]=StaticValues.getDeviceId(deviceName[position], StaticValues.deviceMapForSelectedController);
         if(position==0){
             if("0".equals(StaticValues.statusMap.get(deviceIdArray[position])))
@@ -143,24 +146,24 @@ public class CustomList extends ArrayAdapter<String> {
                     if(isFanOn){
                         isFanOn=false;
                         signal="0";
-                        imageButton.setImageResource(R.drawable.deviceoff1);
+                        imageButton.setImageResource(R.drawable.deviceoff);
                     }
                     else{
                         isFanOn=true;
                         signal="1";
-                        imageButton.setImageResource(R.drawable.deviceon1);
+                        imageButton.setImageResource(R.drawable.deviceon);
                     }
                 }
                 if(position==1){
                     if(isLightOn){
                         signal="0";
                         isLightOn=false;
-                        imageButton.setImageResource(R.drawable.deviceoff1);
+                        imageButton.setImageResource(R.drawable.deviceoff);
                     }
                     else{
                         signal="1";
                         isLightOn=true;
-                        imageButton.setImageResource(R.drawable.deviceon1);
+                        imageButton.setImageResource(R.drawable.deviceon);
                     }
                 }
                 TestMQTT testMQTT=new TestMQTT();
@@ -178,9 +181,13 @@ public class CustomList extends ArrayAdapter<String> {
             final View layout = layoutInflator.inflate(R.layout.timer,
                         (ViewGroup) v.findViewById(R.id.popup_timer));
 
-            popupWindow = new PopupWindow(layout, 1000, 750, true);
-            popupWindow.showAtLocation(layout, Gravity.CENTER, 0, 170);
+            //popupWindow = new PopupWindow(layout, 1000, 750, true);
+            popupWindow = new PopupWindow(layout, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+            popupWindow.showAtLocation(layout, Gravity.CENTER, 0, 0);
             popupWindow.setFocusable(true);
+
+
+
             /*layout.setOnTouchListener(new View.OnTouchListener(){
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent){
@@ -188,6 +195,7 @@ public class CustomList extends ArrayAdapter<String> {
                     return true;
                 }
             });*/
+
             Toolbar toolbar = (Toolbar) layout.findViewById(R.id.mytoolbar);
             TextView textView = (TextView) toolbar.findViewById(R.id.tv_toolbar);
             ImageButton closePopup = (ImageButton) toolbar.findViewById(R.id.close_popup);
@@ -247,12 +255,12 @@ public class CustomList extends ArrayAdapter<String> {
                         if(isSchedulerDeviceOn){
                             schedularDeviceStatus="0";
                             isSchedulerDeviceOn=false;
-                            toggleButton.setImageResource(R.drawable.deviceoff1);
+                            toggleButton.setImageResource(R.drawable.deviceoff);
                         }
                         else {
                             schedularDeviceStatus="1";
                             isSchedulerDeviceOn=true;
-                            toggleButton.setImageResource(R.drawable.deviceon1);
+                            toggleButton.setImageResource(R.drawable.deviceon);
                         }
                     }
                 });

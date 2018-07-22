@@ -115,20 +115,22 @@ public class AddControllerActivity extends Fragment {
     public static HashMap<String, HashMap<String,String>> jsonToHashMap(JSONObject object) throws JSONException {
         HashMap<String, HashMap<String,String>> map = new HashMap<String, HashMap<String,String>>();
         HashMap<String, String> innerMap=null;
-        Iterator<String> keysItrOuter = object.keys();
-        while(keysItrOuter.hasNext()) {
-            String keyOuter = keysItrOuter.next();
-            Object valueOuter = object.get(keyOuter);
-            JSONObject innerJsonObject = (JSONObject)valueOuter;
-            Iterator<String> keysItrInner = innerJsonObject.keys();
-            innerMap = new HashMap<String, String>();
-            while(keysItrInner.hasNext()){
-                String keyInner = keysItrInner.next();
-                Object valueInner = innerJsonObject.get(keyInner);
-                String valueInnerAsString = valueInner.toString();
-                innerMap.put(keyInner, valueInnerAsString);
+        if(object!=null){
+            Iterator<String> keysItrOuter = object.keys();
+            while(keysItrOuter.hasNext()) {
+                String keyOuter = keysItrOuter.next();
+                Object valueOuter = object.get(keyOuter);
+                JSONObject innerJsonObject = (JSONObject)valueOuter;
+                Iterator<String> keysItrInner = innerJsonObject.keys();
+                innerMap = new HashMap<String, String>();
+                while(keysItrInner.hasNext()){
+                    String keyInner = keysItrInner.next();
+                    Object valueInner = innerJsonObject.get(keyInner);
+                    String valueInnerAsString = valueInner.toString();
+                    innerMap.put(keyInner, valueInnerAsString);
+                }
+                map.put(keyOuter, innerMap);
             }
-            map.put(keyOuter, innerMap);
         }
         return map;
     }
@@ -158,8 +160,12 @@ public class AddControllerActivity extends Fragment {
                 jsonResponse = httpurlConnection.invokeService(StaticValues.addControllerURL, postDataParams);
                 StaticValues.serverResult=jsonToHashMap(jsonResponse);
                 try{
-                    jsonObject=(JSONObject)jsonResponse.get("response");
-                    response=jsonObject.get("status").toString();
+                    if(jsonResponse!=null){
+                        jsonObject=(JSONObject)jsonResponse.get("response");
+                        if(jsonObject!=null)
+                            response=jsonObject.get("status").toString();
+                    }
+
                 }
                 catch (Exception e){
                     e.printStackTrace();
@@ -198,25 +204,28 @@ public class AddControllerActivity extends Fragment {
                 StaticValues.securityMap.put(newControllerNumber, StaticValues.serverResult.get("broadcastDetails").get("security"));
                 StaticValues.topicMap.put(newControllerNumber, StaticValues.serverResult.get("broadcastDetails").get("topic"));
 
-                Iterator iteratorSecurityMap=StaticValues.securityMap.entrySet().iterator();
-                while(iteratorSecurityMap.hasNext()){
-                    Map.Entry entry= (Map.Entry) iteratorSecurityMap.next();
-                    myDb.insertSecurityData(entry.getKey().toString(), entry.getValue().toString());
+                if(StaticValues.securityMap!=null){
+                    Iterator iteratorSecurityMap=StaticValues.securityMap.entrySet().iterator();
+                    while(iteratorSecurityMap.hasNext()){
+                        Map.Entry entry= (Map.Entry) iteratorSecurityMap.next();
+                        myDb.insertSecurityData(entry.getKey().toString(), entry.getValue().toString());
+                    }
                 }
-
-                Iterator iteratorTopicMap=StaticValues.topicMap.entrySet().iterator();
-                while(iteratorTopicMap.hasNext()){
-                    Map.Entry entry= (Map.Entry) iteratorTopicMap.next();
-                    myDb.insertTopicData(entry.getKey().toString(), entry.getValue().toString());
+                if(StaticValues.topicMap!=null){
+                    Iterator iteratorTopicMap=StaticValues.topicMap.entrySet().iterator();
+                    while(iteratorTopicMap.hasNext()){
+                        Map.Entry entry= (Map.Entry) iteratorTopicMap.next();
+                        myDb.insertTopicData(entry.getKey().toString(), entry.getValue().toString());
+                    }
                 }
-
                 StaticValues.statusMap=StaticValues.serverResult.get("deviceStatus");
-                Iterator iteratorStatusMap=StaticValues.statusMap.entrySet().iterator();
-                while(iteratorStatusMap.hasNext()){
-                    Map.Entry entry= (Map.Entry) iteratorStatusMap.next();
-                    myDb.insertStatusData(entry.getKey().toString(), entry.getValue().toString());
+                if(StaticValues.statusMap!=null){
+                    Iterator iteratorStatusMap=StaticValues.statusMap.entrySet().iterator();
+                    while(iteratorStatusMap.hasNext()){
+                        Map.Entry entry= (Map.Entry) iteratorStatusMap.next();
+                        myDb.insertStatusData(entry.getKey().toString(), entry.getValue().toString());
+                    }
                 }
-
                 myDb.printControllerData(StaticValues.USERNAME);
                 myDb.printDeviceData(StaticValues.USERNAME);
                 myDb.printSchedularData(StaticValues.USERNAME);

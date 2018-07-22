@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
+    android:weightSum="20"
     android:layout_height="match_parent" android:background="@color/colorWhite"
     android:id="@+id/popup_element_edit">
 
     <EditText
         android:id="@+id/etControllerNumber"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="50dp"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
         android:backgroundTint="@color/colorTeal"
         android:textColorHint="@color/colorGreyLight"
+        android:layout_weight="1"
         android:textColor="@color/colorBlack"
         android:hint="Enter iSwitch Id"
         android:layout_gravity="center_horizontal"
@@ -19,29 +21,23 @@
 
     <EditText
         android:id="@+id/etPassKey"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
         android:backgroundTint="@color/colorTeal"
         android:textColorHint="@color/colorGreyLight"
         android:textColor="@color/colorBlack"
         android:hint="Enter Pass Key"
+        android:layout_weight="1"
         android:layout_below="@+id/etControllerName"
         android:inputType="textPassword"
         android:layout_gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <!--Spinner
-        android:id="@+id/spinnerControllerNames"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorWhite"
-        android:spinnerMode="dropdown"/-->
-
     <AutoCompleteTextView
         android:id="@+id/actvControllerName"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
         android:backgroundTint="@color/colorTeal"
@@ -49,20 +45,14 @@
         android:textColor="@color/colorBlack"
         android:layout_below="@+id/etControllerNumber"
         android:hint="Enter Room Name"
+        android:layout_weight="1"
         android:layout_gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <!--Spinner
-        android:id="@+id/spinnerFirstDeviceNames"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorWhite"
-        android:spinnerMode="dropdown"/-->
-
     <AutoCompleteTextView
         android:id="@+id/actvFirstDeviceName"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
         android:backgroundTint="@color/colorTeal"
@@ -70,20 +60,14 @@
         android:textColor="@color/colorBlack"
         android:layout_below="@+id/etControllerNumber"
         android:hint="Enter First Device Name"
+        android:layout_weight="1"
         android:layout_gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <!--Spinner
-        android:id="@+id/spinnerSecondDeviceNames"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorWhite"
-        android:spinnerMode="dropdown"/-->
-
     <AutoCompleteTextView
         android:id="@+id/actvSecondDeviceName"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
         android:backgroundTint="@color/colorTeal"
@@ -91,6 +75,7 @@
         android:textColor="@color/colorBlack"
         android:layout_below="@+id/etControllerNumber"
         android:hint="Enter Second Device Name"
+        android:layout_weight="1"
         android:layout_gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
@@ -99,9 +84,11 @@
         android:layout_width="match_parent"
         android:id="@+id/btnAddController"
         android:src="@drawable/addiswitch"
-        android:layout_marginTop="70dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
+        android:layout_marginTop="70dp"
+        android:layout_weight="15"
+        android:layout_gravity="bottom"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent" />
 

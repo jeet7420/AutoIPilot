@@ -45,15 +45,8 @@ public class ControllerActivity extends Fragment {
     DatabaseHelper myDb;
     String[] deviceName;
     String[] deviceId;
-    Integer[] imageId = {
-            R.drawable.fan,
-            R.drawable.light1
-    };
-
-    Integer[] deviceStatusImage = {
-            R.drawable.deviceon1,
-            R.drawable.deviceoff1
-    };
+    Integer[] imageId;
+    Integer[] deviceStatusImage;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,6 +61,7 @@ public class ControllerActivity extends Fragment {
         userId=StaticValues.USERNAME;
         controllerName=StaticValues.controllerName;
         controllerId=StaticValues.getControllerId(controllerName);
+        position=0;
         StaticValues.controllerId=controllerId;
         System.out.println("CONTROLLER ID : " + controllerId);
         System.out.println("CONTROLLER NAME : " + controllerName);
@@ -79,6 +73,8 @@ public class ControllerActivity extends Fragment {
         System.out.println("NUMBER OF DEVICES : " + numberOfDevices);
         deviceName=new String[numberOfDevices];
         deviceId=new String[numberOfDevices];
+        imageId=new Integer[numberOfDevices];
+        deviceStatusImage=new Integer[numberOfDevices];
         Iterator iteratorDeviceMapForSelectedController = deviceMapForSelectedController.entrySet().iterator();
         while (iteratorDeviceMapForSelectedController.hasNext()) {
             Map.Entry entry = (Map.Entry)iteratorDeviceMapForSelectedController.next();
@@ -100,7 +96,7 @@ public class ControllerActivity extends Fragment {
                 imageId[i]=R.drawable.geysor;
             }
             else if("3-Pin".equals(deviceName[i])){
-                imageId[i]=R.drawable.pin;
+                imageId[i]=R.drawable.pin1;
             }
             else{
                 imageId[i]=R.drawable.fan;
@@ -109,10 +105,10 @@ public class ControllerActivity extends Fragment {
 
         for(int i=0; i<numberOfDevices; i++){
             if("0".equals(StaticValues.statusMap.get(deviceId[i]))){
-                deviceStatusImage[i]=R.drawable.deviceoff1;
+                deviceStatusImage[i]=R.drawable.deviceoff;
             }
             else{
-                deviceStatusImage[i]=R.drawable.deviceon1;
+                deviceStatusImage[i]=R.drawable.deviceon;
             }
         }
 

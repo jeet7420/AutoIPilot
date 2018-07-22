@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:background="@color/colorWhite"
+    android:weightSum="20"  android:background="@color/colorWhite"
+    android:layout_height="match_parent"
     android:id="@+id/popup_element_edit">
 
     <AutoCompleteTextView
@@ -9,6 +10,7 @@
         android:layout_marginTop="100dp"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
+        android:layout_weight="1"
         android:backgroundTint="@color/colorTeal"
         android:textColorHint="@color/colorGreyLight"
         android:textColor="@color/colorBlack"
@@ -23,6 +25,7 @@
         android:layout_marginTop="15dp"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
+        android:layout_weight="1"
         android:backgroundTint="@color/colorTeal"
         android:textColorHint="@color/colorGreyLight"
         android:textColor="@color/colorBlack"
@@ -37,6 +40,7 @@
         android:layout_marginTop="15dp"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
+        android:layout_weight="1"
         android:backgroundTint="@color/colorTeal"
         android:textColorHint="@color/colorGreyLight"
         android:textColor="@color/colorBlack"
@@ -50,6 +54,8 @@
         android:layout_width="match_parent"
         android:id="@+id/btnSave"
         android:src="@drawable/save"
+        android:layout_weight="17"
+        android:layout_gravity="bottom"
         android:layout_marginTop="100dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
